@@ -1,0 +1,23 @@
+.contestListContainer {
+    padding: 2rem 0;
+  }
+  
+  .card {
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  
+    h5 {
+      color: #343a40;
+    }
+  
+    .progress {
+      height: 20px;
+      border-radius: 10px;
+  
+      .progress-bar {
+        background-color: #007bff;
+      }
+    }
+  }
+  
