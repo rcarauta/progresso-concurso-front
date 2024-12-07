@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { RootState } from '../../store/store';
+import { RootState } from '../../store/authStore';
 import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import axios from 'axios'; // Usando axios para fazer requisições HTTP
 import styles from './ContestList.module.scss';
+import { Contest } from '../../models/Contest';
 
 const ContestList: React.FC = () => {
   const { token, username, isLoggedIn } = useSelector((state: RootState) => state.auth);
-  const [contests, setContests] = useState<any[]>([]); // Estado para armazenar os concursos
+  const [contests, setContests] = useState<Contest[]>([]); // Estado para armazenar os concursos
   const [loading, setLoading] = useState<boolean>(false); // Estado de carregamento
   const [error, setError] = useState<string | null>(null); // Estado de erro
 
@@ -41,8 +42,8 @@ const ContestList: React.FC = () => {
     }
   }, [isLoggedIn, token]); // Reexecuta o useEffect quando o status de login ou o token mudar
 
-  const handleSeeTable = () => {
-    navigate('/contests/table'); // Redireciona para a página com a tabela de concursos
+  const handleSeeTable = (id: number) => {
+    navigate(`/contests/table/${id}`); // Redireciona para a página com a tabela de concursos
   };
 
   return (
@@ -73,21 +74,21 @@ const ContestList: React.FC = () => {
             <div className="card p-3 mb-4 shadow-sm">
               <h5>{contest.nome}</h5>
               <p>
-                <strong>Data da Prova:</strong> {contest.dataProva}
+                <strong>Data da Prova:</strong> {contest.dataProvaDate}
               </p>
               <div className="progress mb-3">
                 <div
                   className="progress-bar"
                   role="progressbar"
-                  style={{ width: `${contest.percentualEstudado}%` }}
-                  aria-valuenow={contest.percentualEstudado}
+                  style={{ width: `${contest.percentualEstudadoFloat}%` }}
+                  aria-valuenow={contest.percentualEstudadoFloat}
                   aria-valuemin={0}
                   aria-valuemax={100}
                 >
-                  {contest.percentualEstudado}%
+                  {contest.percentualEstudadoFloat}%
                 </div>
               </div>
-              <button className="btn btn-primary w-100" onClick={handleSeeTable}>
+              <button className="btn btn-primary w-100" onClick={() => handleSeeTable(contest.id)}>
                 Ver Tabela
               </button>
             </div>

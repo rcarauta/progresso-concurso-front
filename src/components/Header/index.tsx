@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { RootState } from '../../store/store';
+import { RootState } from '../../store/authStore';
 import { logout } from '../../store/authSlice';
 import styles from './Header.module.scss';
 
@@ -46,6 +46,16 @@ const Header: React.FC = () => {
             <li className="nav-item">
               <Link className="nav-link" to="/contests">
                 Concursos
+              </Link>
+            </li>
+            <li className="nav-item">
+              <Link className="nav-link" to="/user">
+                Usuários
+              </Link>
+            </li>
+            <li className="nav-item">
+              <Link className="nav-link" to="/disciplina/novo">
+                Disciplinas
               </Link>
             </li>
             {username === 'admin' && (

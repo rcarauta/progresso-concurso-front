@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../store/store';
+import { RootState } from '../../store/authStore';
 import { loginAsync, logout, clearError } from '../../store/authSlice';
 import styles from './LoginForm.module.scss';
 

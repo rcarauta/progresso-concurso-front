@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Tab, Tabs, Table, ProgressBar } from 'react-bootstrap';
+import { useParams } from 'react-router-dom';
 
 const ContestTable: React.FC = () => {
   const [key, setKey] = useState<string>('disciplinas');
-
+  const contestId = useParams();
   // Dados mock para as disciplinas
   const disciplinasBasicas = [
     { nome: 'Matemática', progresso: 60, ciclosCompletos: 5 },
