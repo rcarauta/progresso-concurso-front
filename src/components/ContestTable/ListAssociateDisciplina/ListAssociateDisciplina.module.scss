@@ -1,0 +1,38 @@
+.container {
+    margin-top: 20px;
+  }
+  
+  .title {
+    font-size: 1.5rem;
+    color: #333;
+    margin-bottom: 20px;
+  }
+  
+  .table {
+    width: 100%;
+    border: 1px solid #ddd;
+    background-color: #fff;
+  }
+  
+  .spinner {
+    margin: 20px auto;
+    display: block;
+  }
+  
+  .textDanger {
+    color: #dc3545;
+  }
+  
+  .buttonSuccess {
+    background-color: #28a745;
+    border: none;
+    &:hover {
+      background-color: #218838;
+    }
+  }
+
+  .successAlert {
+    margin-top: 20px;
+  }
+  
+  

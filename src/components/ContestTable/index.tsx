@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Tab, Tabs, Table, ProgressBar } from 'react-bootstrap';
-import { useParams } from 'react-router-dom';
+import { Tab, Tabs, Table, ProgressBar, Button } from 'react-bootstrap';
+import { useParams, Link } from 'react-router-dom';
 
 const ContestTable: React.FC = () => {
   const [key, setKey] = useState<string>('disciplinas');
@@ -20,6 +20,13 @@ const ContestTable: React.FC = () => {
 
   return (
     <div className="container mt-4">
+       <div className="d-flex justify-content-between align-items-center mb-3">
+          <h3>Gerenciamento de Disciplinas</h3>
+            <Link to={`/contest/table/${contestId.id}/associar`}>
+                <Button variant="primary">Adicionar Disciplina ao Concurso</Button>
+            </Link>
+        </div>
+
       <Tabs
         id="disciplinas-tabela"
         activeKey={key}

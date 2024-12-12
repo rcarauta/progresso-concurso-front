@@ -1,5 +1,6 @@
 export interface Disciplina {
+    id: number;
     nome: string;
     categoria: 'BASICA' | 'ESPECIFICA';
-    porcentagemConclusao: number;
+    porcentagem: number;
 }

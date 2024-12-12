@@ -13,7 +13,7 @@ const DisciplinaForm = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const disciplina = {nome, categoria, porcentagemConclusao: 0};
+    const disciplina = {nome, categoria, porcentagem: 0};
     dispatch(saveDisciplina(disciplina));
   };
 
