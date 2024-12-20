@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { Disciplina } from '../models/Disciplina';
+import { Contest } from '../models/Contest';
 
 
 interface DisciplinaState {
@@ -8,6 +9,7 @@ interface DisciplinaState {
   successMessage: string | null;
   disciplinas: Disciplina[];
   error: string | null;
+  concurso: Contest;
 }
 
 const initialState: DisciplinaState = {
@@ -15,6 +17,10 @@ const initialState: DisciplinaState = {
   successMessage: null,
   disciplinas: [],
   error: null,
+  concurso: {
+    listaDisciplinaEntity: [],
+    listaDisciplinaRequest: []
+  } as unknown as Contest,
 };
 
 export const saveDisciplina = createAsyncThunk(
@@ -39,7 +45,7 @@ export const saveDisciplina = createAsyncThunk(
 
 export const fetchDisciplinas = createAsyncThunk(
   'disciplinas/fetchDisciplinas',
-  async (_, { getState, rejectWithValue }) => {
+  async (concursoId, { getState, rejectWithValue }) => {
     try {
       // Obter o token do estado global
       const state: any = getState();
@@ -47,7 +53,7 @@ export const fetchDisciplinas = createAsyncThunk(
 
       // Fazer a requisição para buscar disciplinas
       const response = await axios.get(
-        `http://localhost:8080/disciplina/list`,
+        `http://localhost:8080/disciplina/${concursoId}/list_not_concurso`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -85,6 +91,29 @@ export const associateDisciplina = createAsyncThunk(
     }
   }
 );
+
+export const fetchDisciplinasConcurso = createAsyncThunk(
+  'disciplinas/fetchDisciplinasConcurso',
+  async (concursoId: string, { getState, rejectWithValue }) => {
+    try {
+      const state: any = getState();
+      const token = state.auth?.token;
+
+      const response = await axios.get(
+        `http://localhost:8080/concurso_disciplina/${concursoId}/todas_disciplinas`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      return response.data; // Certifique-se de que o retorno seja uma lista de disciplinas
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Erro ao buscar disciplinas');
+    }
+  }
+);
+
 
 
 const disciplinaSlice = createSlice({
@@ -124,7 +153,16 @@ const disciplinaSlice = createSlice({
       .addCase(associateDisciplina.fulfilled, (state, action) => {
         state.loading = false;
         state.successMessage = "Concurso associado com disciplina ocm sucesso!";
-      });
+      })
+      //lista disciplina concurso
+      .addCase(fetchDisciplinasConcurso.fulfilled, (state, action) => {
+        state.loading = false;
+        state.concurso = action.payload;
+      })
+      .addCase(fetchDisciplinasConcurso.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Erro ao carregar disciplinas.';
+      })
   },
 });
 

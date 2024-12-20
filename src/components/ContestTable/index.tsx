@@ -1,22 +1,30 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Tab, Tabs, Table, ProgressBar, Button } from 'react-bootstrap';
+import { useDispatch, useSelector } from 'react-redux';
 import { useParams, Link } from 'react-router-dom';
+import { RootState } from '../../store/disciplinaStore';
+import { fetchDisciplinasConcurso } from '../../store/disciplinaSlice';
 
 const ContestTable: React.FC = () => {
   const [key, setKey] = useState<string>('disciplinas');
   const contestId = useParams();
-  // Dados mock para as disciplinas
-  const disciplinasBasicas = [
-    { nome: 'Matemática', progresso: 60, ciclosCompletos: 5 },
-    { nome: 'Português', progresso: 80, ciclosCompletos: 7 },
-    { nome: 'Raciocínio Lógico', progresso: 40, ciclosCompletos: 3 },
-  ];
+  const dispatch = useDispatch();
+  
+  const {concurso, loading } = useSelector((state: RootState) => state.disciplina)
 
-  const disciplinasEspecificas = [
-    { nome: 'Direito Constitucional', progresso: 70, ciclosCompletos: 6 },
-    { nome: 'Direito Administrativo', progresso: 50, ciclosCompletos: 4 },
-    { nome: 'Legislação Específica', progresso: 90, ciclosCompletos: 8 },
-  ];
+  const disciplinasBasicas = concurso?.listaDisciplinaRequest?.filter((disciplina) => disciplina.categoria == 'BASICA');
+
+  const disciplinasEspecificas = concurso?.listaDisciplinaRequest?.filter((disciplina) => disciplina.categoria == 'ESPECIFICA')
+
+  useEffect(() => {
+    if (contestId.id) {
+      dispatch(fetchDisciplinasConcurso(contestId.id));
+    }
+  }, [contestId.id, dispatch]);
+
+  if (loading) {
+    return <div>Carregando disciplinas...</div>;
+  }
 
   return (
     <div className="container mt-4">
@@ -49,23 +57,31 @@ const ContestTable: React.FC = () => {
               </tr>
               {disciplinasBasicas.map((disciplina, index) => (
                 <tr key={index}>
-                  <td>{disciplina.nome}</td>
-                  <td>
-                    <ProgressBar now={disciplina.progresso} label={`${disciplina.progresso}%`} />
-                  </td>
-                  <td>{disciplina.ciclosCompletos}</td>
+                    <td>
+                      <Link to={`/contest/table/${contestId.id}/${disciplina.id}/materias`}>
+                          {disciplina.nome}
+                      </Link>
+                    </td>
+                    <td>
+                      <ProgressBar now={disciplina.porcentagem} label={`${disciplina.porcentagem}%`} />
+                    </td>
+                    <td>{disciplina.ciclos}</td>
                 </tr>
               ))}
               <tr>
                 <td colSpan={3} className="text-center"><strong>Disciplinas Específicas</strong></td>
               </tr>
               {disciplinasEspecificas.map((disciplina, index) => (
-                <tr key={index}>
-                  <td>{disciplina.nome}</td>
-                  <td>
-                    <ProgressBar now={disciplina.progresso} label={`${disciplina.progresso}%`} />
-                  </td>
-                  <td>{disciplina.ciclosCompletos}</td>
+                <tr key={index}> 
+                    <td>
+                      <Link to={`/contest/table/${contestId.id}/${disciplina.id}/materias`}>
+                        {disciplina.nome}
+                      </Link>
+                    </td>
+                    <td>
+                      <ProgressBar now={disciplina.porcentagem} label={`${disciplina.porcentagem}%`} />
+                    </td>
+                    <td>{disciplina.ciclos}</td>
                 </tr>
               ))}
             </tbody>

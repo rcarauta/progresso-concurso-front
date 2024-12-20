@@ -1,0 +1,38 @@
+.container {
+    padding: 20px;
+  }
+  
+  h1 {
+    font-size: 2rem;
+    color: #333;
+  }
+  
+  .mb-3 {
+    margin-bottom: 20px;
+  }
+  
+  .table {
+    margin-top: 20px;
+    background-color: #fff;
+  }
+  
+  .table th, .table td {
+    text-align: center;
+    vertical-align: middle;
+  }
+  
+  .text-center {
+    text-align: center;
+  }
+  
+  .d-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  button {
+    font-size: 1rem;
+    padding: 0.5rem 1.5rem;
+  }
+  

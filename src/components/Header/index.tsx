@@ -58,6 +58,11 @@ const Header: React.FC = () => {
                 Disciplinas
               </Link>
             </li>
+            <li className="nav-item">
+              <Link className="nav-link" to="/materia/novo">
+                Materias
+              </Link>
+            </li>
             {username === 'admin' && (
               <li className="nav-item">
                 <Link className="nav-link" to="/admin">

@@ -3,4 +3,5 @@ export interface Disciplina {
     nome: string;
     categoria: 'BASICA' | 'ESPECIFICA';
     porcentagem: number;
+    ciclos: number;
 }

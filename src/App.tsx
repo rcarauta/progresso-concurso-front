@@ -10,6 +10,9 @@ import UserForm from './components/FormUsuario';
 import UserList from './components/ListUsuario';
 import DisciplinaForm from './components/DisciplinaForm/inde';
 import ListAssociateDisciplina from './components/ContestTable/ListAssociateDisciplina';
+import MateriaForm from './components/MateriaForm';
+import MateriaList from './components/MateriaList';
+import AssociarMaterias from './components/MateriaList/ListAssociateMateria';
 
 const App: React.FC = () => {
   const { isLoggedIn } = useSelector((state: RootState) => state.auth);
@@ -24,9 +27,12 @@ const App: React.FC = () => {
         <Route path="/user" element={isLoggedIn ? <UserList /> : <Navigate to="/login" />} />
         <Route path="/user/novo" element={isLoggedIn ? <UserForm /> : <Navigate to="/login" />} /> 
         <Route path="/disciplina/novo" element={isLoggedIn ? <DisciplinaForm />: <Navigate to="/login" />} />
+        <Route path="/materia/novo" element={isLoggedIn ? <MateriaForm /> : <Navigate to="/login" />} />
         <Route path="/contests" element={isLoggedIn ? <ContestList /> : <Navigate to="/login" />} />
         <Route path="/contests/table/:id" element={isLoggedIn ? <ContestTable /> : <Navigate to="/login" />} />
         <Route path="/contest/table/:id/associar" element={isLoggedIn ? <ListAssociateDisciplina /> : <Navigate to="/login" /> } />
+        <Route path="/contest/table/:concursoId/:disciplinaId/materias" element={isLoggedIn ? <MateriaList /> : <Navigate to="/login" />} />
+        <Route path="/contest/table/:concursoId/:disciplinaId/materias/associar" element={isLoggedIn ? <AssociarMaterias /> : <Navigate to="/login" />} />
         <Route path="*" element={<div>Página não encontrada!</div>} />
       </Routes>
     </Router>
