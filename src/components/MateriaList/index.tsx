@@ -22,7 +22,7 @@ const MateriaList: React.FC = () => {
   useEffect(() => {
     if (materias && materias.length > 0) {
       const initialTimes = materias.reduce((acc: any, materia: any) => {
-        acc[materia.id] = 40 * 60; // 40 minutos em segundos
+        acc[materia.id] = 1 * 60; // 40 minutos em segundos
         return acc;
       }, {});
       setTimeRemaining(initialTimes);
@@ -47,8 +47,16 @@ const MateriaList: React.FC = () => {
           setRunningTimers((prevRunning) => ({ ...prevRunning, [id]: false }));
 
           // Atualizar o tempo total de estudo ao final
-          materia.tempoEstudo += 40; // Adiciona 40 minutos
+          // AQUI ESTÁ A ALTERAÇÃO PARA EVITAR O ERRO DE OBJETO IMUTÁVEL
+          const updatedMateria = {
+            ...materia,
+            tempoEstudo: materia.tempoEstudo + 40, // Adiciona 40 minutos ao tempo de estudo
+          };
+          console.log('Materia Atualizada:', updatedMateria);
+
+          // Aqui, você provavelmente deveria despachar a ação do Redux para atualizar o estado, se necessário.
           alert(`Cronômetro finalizado para ${materia.nome}!`);
+
           return { ...prev, [id]: 0 };
         }
 
