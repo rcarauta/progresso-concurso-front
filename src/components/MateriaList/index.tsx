@@ -46,6 +46,8 @@ const MateriaList: React.FC = () => {
           setIntervalRefs((prevRefs) => ({ ...prevRefs, [id]: null }));
           setRunningTimers((prevRunning) => ({ ...prevRunning, [id]: false }));
 
+          openModal(materia);
+
           // Atualizar o tempo total de estudo ao final
           // AQUI ESTÁ A ALTERAÇÃO PARA EVITAR O ERRO DE OBJETO IMUTÁVEL
           const updatedMateria = {
@@ -55,7 +57,6 @@ const MateriaList: React.FC = () => {
           console.log('Materia Atualizada:', updatedMateria);
 
           // Aqui, você provavelmente deveria despachar a ação do Redux para atualizar o estado, se necessário.
-          alert(`Cronômetro finalizado para ${materia.nome}!`);
 
           return { ...prev, [id]: 0 };
         }
