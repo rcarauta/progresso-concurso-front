@@ -108,6 +108,30 @@ export const listMateriasSemAssociar = createAsyncThunk<Materia[], { concursoId:
     }
   );
 
+
+export const updateMateria = createAsyncThunk<Materia, Materia, { rejectValue: string }>(
+  'materia/updateMateria',
+  async (materia, { getState, rejectWithValue }) => {
+    try {
+      const state: any = getState();
+      const token = state.auth.token; 
+
+      const response = await axios.put(
+        'http://localhost:8080/materia',
+        materia,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Erro desconhecido');
+    }
+  }
+);
   
 
 // Cria o Slice do Redux
@@ -154,7 +178,7 @@ const materiaSlice = createSlice({
       })
       .addCase(listMateriasSemAssociar.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || 'Erro ao listar as matérias';;
+        state.error = action.payload || 'Erro ao listar as matérias';
       })
       //associar materia
       .addCase(associarMateria.pending, (state) => {
@@ -168,6 +192,18 @@ const materiaSlice = createSlice({
       .addCase(associarMateria.rejected, (state) => {
         state.loading = false;
         state.error = 'Erro ao associar matéria';
+      })
+      //Atualizar materia
+      .addCase(updateMateria.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(updateMateria.fulfilled, (state, action) => {
+        state.loading = false;
+        state.materia = action.payload;
+      })
+      .addCase(updateMateria.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || 'Erro ao listar as matérias';
       });
   },
 });

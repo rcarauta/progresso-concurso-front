@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { listMaterias } from '../../store/materiaSlice';
+import { listMaterias, updateMateria } from '../../store/materiaSlice';
 import { useParams, Link } from 'react-router-dom';
 import { Table, Button, Modal, Form } from 'react-bootstrap';
 import styles from './MateriaList.module.scss';
@@ -11,118 +11,85 @@ const MateriaList: React.FC = () => {
 
   const { materias, loading, error } = useSelector((state: any) => state.materia);
 
-  const [showModal, setShowModal] = useState(false);
+  const [showTimerModal, setShowTimerModal] = useState(false);
+  const [showPercentageModal, setShowPercentageModal] = useState(false);
   const [currentMateria, setCurrentMateria] = useState<any>(null);
   const [percentage, setPercentage] = useState<number>(0);
-  const [runningTimers, setRunningTimers] = useState<{ [id: number]: boolean }>({});
-  const [intervalRefs, setIntervalRefs] = useState<{ [id: number]: number | null }>({});
-  const [timeRemaining, setTimeRemaining] = useState<{ [id: number]: number }>({});
-
-  // Inicializa o tempo restante para cada matéria
-  useEffect(() => {
-    if (materias && materias.length > 0) {
-      const initialTimes = materias.reduce((acc: any, materia: any) => {
-        acc[materia.id] = 1 * 60; // 40 minutos em segundos
-        return acc;
-      }, {});
-      setTimeRemaining(initialTimes);
-    }
-  }, [materias]);
-
-  // Iniciar o cronômetro
-  const startTimer = (materia: any) => {
-    const id = materia.id;
-
-    if (runningTimers[id]) return; // Evita múltiplos timers para a mesma matéria
-
-    setRunningTimers((prev) => ({ ...prev, [id]: true }));
-
-    const intervalId = window.setInterval(() => {
-      setTimeRemaining((prev) => {
-        const newTime = prev[id] - 1;
-
-        if (newTime <= 0) {
-          clearInterval(intervalRefs[id]!);
-          setIntervalRefs((prevRefs) => ({ ...prevRefs, [id]: null }));
-          setRunningTimers((prevRunning) => ({ ...prevRunning, [id]: false }));
-
-          openModal(materia);
-
-          // Atualizar o tempo total de estudo ao final
-          // AQUI ESTÁ A ALTERAÇÃO PARA EVITAR O ERRO DE OBJETO IMUTÁVEL
-          const updatedMateria = {
-            ...materia,
-            tempoEstudo: materia.tempoEstudo + 40, // Adiciona 40 minutos ao tempo de estudo
-          };
-          console.log('Materia Atualizada:', updatedMateria);
-
-          // Aqui, você provavelmente deveria despachar a ação do Redux para atualizar o estado, se necessário.
-
-          return { ...prev, [id]: 0 };
-        }
-
-        return { ...prev, [id]: newTime };
-      });
-    }, 1000);
-
-    setIntervalRefs((prev) => ({ ...prev, [id]: intervalId }));
-  };
-
-  // Pausar o cronômetro
-  const pauseTimer = (materia: any) => {
-    const id = materia.id;
-    if (runningTimers[id] && intervalRefs[id] !== null) {
-      clearInterval(intervalRefs[id]!);
-      setIntervalRefs((prev) => ({ ...prev, [id]: null }));
-      setRunningTimers((prev) => ({ ...prev, [id]: false }));
-    }
-  };
-
-  // Retomar o cronômetro
-  const resumeTimer = (materia: any) => {
-    const id = materia.id;
-    if (!runningTimers[id] && timeRemaining[id] > 0) {
-      startTimer(materia);
-    }
-  };
-
-  // Formatar o tempo no estilo mm:ss
-  const formatTime = (seconds: number) => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
-  };
-
-  // Abrir o modal para atualizar porcentagem
-  const openModal = (materia: any) => {
-    setCurrentMateria(materia);
-    setShowModal(true);
-  };
-
-  // Fechar o modal
-  const closeModal = () => {
-    setShowModal(false);
-    setPercentage(0);
-  };
-
-  // Atualizar a porcentagem e o tempo total de estudo
-  const handleSavePercentage = () => {
-    if (currentMateria) {
-      const updatedMateria = {
-        ...currentMateria,
-        porcentagem: percentage,
-      };
-
-      console.log('Atualizando matéria:', updatedMateria);
-      closeModal();
-    }
-  };
+  const [timeRemaining, setTimeRemaining] = useState<number>(60 * 40); 
+  const [running, setRunning] = useState(false);
 
   useEffect(() => {
     if (concursoId && disciplinaId) {
       dispatch(listMaterias({ concursoId: +concursoId, disciplinaId: +disciplinaId }));
     }
   }, [concursoId, disciplinaId, dispatch]);
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (running && timeRemaining > 0) {
+      timer = setInterval(() => {
+        setTimeRemaining((prev) => prev - 1);
+      }, 1000);
+    } else if (timeRemaining <= 0) {
+      clearInterval(timer);
+      handleFinalize();
+    }
+    return () => clearInterval(timer);
+  }, [running, timeRemaining]);
+
+  const handleStart = (materia: any) => {
+    setCurrentMateria(materia);
+    setShowTimerModal(true);
+    setTimeRemaining(60 * 40); // Reset para 40 minutos
+    setRunning(true);
+  };
+
+  const handlePause = () => {
+    setRunning(false);
+  };
+
+  const handleResume = () => {
+    setRunning(true);
+  };
+
+  const handleFinalize = () => {
+    setRunning(false);
+    setShowTimerModal(false);
+    setShowPercentageModal(true);
+  };
+
+  const handleSavePercentage = () => {
+    if (currentMateria) {
+
+      const studiedMinutes = 40 - Math.floor(timeRemaining / 60);
+
+      const updatedMateria = {
+        ...currentMateria,
+        porcentagem: percentage,
+        tempoEstudo: minutesToTime(studiedMinutes),
+      };
+
+      dispatch(updateMateria(updatedMateria))
+        .unwrap()
+        .then(() => {
+          dispatch(listMaterias({ concursoId: +concursoId!, disciplinaId: +disciplinaId! }));
+          setShowPercentageModal(false);
+        })
+        .catch((error: any) => {
+          console.error('Erro ao atualizar matéria:', error);
+        });
+    }
+  };
+
+  const minutesToTime = (minutes) => {
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return `${String(hours).padStart(2, "0")}:${String(mins).padStart(2, "0")}`;
+  };
+
+  const calculateProgress = (): number => {
+    return (timeRemaining / (60 * 40)) * 100;
+  };
 
   return (
     <div className={styles.container}>
@@ -153,21 +120,7 @@ const MateriaList: React.FC = () => {
                 <td>{materia.porcentagem}%</td>
                 <td>{materia.tempoEstudo}</td>
                 <td>
-                  {formatTime(timeRemaining[materia.id] || 0)}{' '}
-                  {runningTimers[materia.id] ? (
-                    <Button variant="warning" onClick={() => pauseTimer(materia)}>
-                      Pausar
-                    </Button>
-                  ) : (
-                    <Button variant="success" onClick={() => resumeTimer(materia)}>
-                      Retomar
-                    </Button>
-                  )}
-                  <Button
-                    variant="primary"
-                    onClick={() => startTimer(materia)}
-                    disabled={runningTimers[materia.id]}
-                  >
+                  <Button variant="primary" onClick={() => handleStart(materia)}>
                     Iniciar
                   </Button>
                 </td>
@@ -183,7 +136,52 @@ const MateriaList: React.FC = () => {
         </tbody>
       </Table>
 
-      <Modal show={showModal} onHide={closeModal}>
+      {/* Modal do Cronômetro */}
+      <Modal show={showTimerModal} onHide={() => setShowTimerModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Cronômetro</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {/* SVG Circle Progress */}
+          <div className={styles.progressContainer}>
+            <svg className={styles.progressCircle} viewBox="0 0 36 36">
+              <path
+                className={styles.background}
+                d="M18 2.0845
+                  a 15.9155 15.9155 0 0 1 0 31.831
+                  a 15.9155 15.9155 0 0 1 0 -31.831"
+              />
+              <path
+                className={styles.foreground}
+                d="M18 2.0845
+                  a 15.9155 15.9155 0 0 1 0 31.831
+                  a 15.9155 15.9155 0 0 1 0 -31.831"
+                strokeDasharray={`${calculateProgress()}, 100`}
+              />
+            </svg>
+            <div className={styles.timerText}>
+              {Math.floor(timeRemaining / 60)}:{(timeRemaining % 60).toString().padStart(2, '0')}
+            </div>
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          {running ? (
+            <Button variant="warning" onClick={handlePause}>
+              Pausar
+            </Button>
+          ) : (
+            <Button variant="success" onClick={handleResume}>
+              Retomar
+            </Button>
+          )}
+          <Button variant="danger" onClick={handleFinalize}>
+            Finalizar
+          </Button>
+        </Modal.Footer>
+      </Modal>
+            
+      {/* Modal de Porcentagem */}
+      <Modal show={showPercentageModal} onHide={() => setShowPercentageModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Atualizar Porcentagem</Modal.Title>
         </Modal.Header>
@@ -202,7 +200,7 @@ const MateriaList: React.FC = () => {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={closeModal}>
+          <Button variant="secondary" onClick={() => setShowPercentageModal(false)}>
             Cancelar
           </Button>
           <Button variant="success" onClick={handleSavePercentage}>
