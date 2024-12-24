@@ -11,6 +11,7 @@ const MateriaList: React.FC = () => {
 
   const { materias, loading, error } = useSelector((state: any) => state.materia);
 
+  const [editedMaterias, setEditedMaterias] = useState<{ [key: number]: any }>({});
   const [showTimerModal, setShowTimerModal] = useState(false);
   const [showPercentageModal, setShowPercentageModal] = useState(false);
   const [currentMateria, setCurrentMateria] = useState<any>(null);
@@ -37,10 +38,20 @@ const MateriaList: React.FC = () => {
     return () => clearInterval(timer);
   }, [running, timeRemaining]);
 
+  const handleInputChange = (id: number, field: string, value: number) => {
+    setEditedMaterias((prev) => ({
+      ...prev,
+      [id]: {
+        ...prev[id],
+        [field]: value,
+      },
+    }));
+  };
+
   const handleStart = (materia: any) => {
     setCurrentMateria(materia);
     setShowTimerModal(true);
-    setTimeRemaining(60 * 40); // Reset para 40 minutos
+    setTimeRemaining(60 * 40); 
     setRunning(true);
   };
 
@@ -69,7 +80,7 @@ const MateriaList: React.FC = () => {
         tempoEstudo: minutesToTime(studiedMinutes),
       };
 
-      dispatch(updateMateria(updatedMateria))
+      dispatch(updateMateria({concursoId: +concursoId!, disciplinaId: +disciplinaId!, materia: updatedMateria}))
         .unwrap()
         .then(() => {
           dispatch(listMaterias({ concursoId: +concursoId!, disciplinaId: +disciplinaId! }));
@@ -81,6 +92,35 @@ const MateriaList: React.FC = () => {
     }
   };
 
+
+  const handleSave = (materia) => {
+    if (materia) {
+      const updatedMateria = {
+        ...materia,
+        porcentagem: materia.porcentagem,
+        tempoEstudo: minutesToTime(0),
+        totalQuestoes: editedMaterias[materia.id]?.totalQuestoes ?? materia.totalQuestoes,
+        questoesAcertadas: editedMaterias[materia.id]?.questoesAcertadas ?? materia.questoesAcertadas,
+      };
+
+      dispatch(
+        updateMateria({
+          concursoId: +concursoId!,
+          disciplinaId: +disciplinaId!,
+          materia: updatedMateria,
+        })
+      )
+        .unwrap()
+        .then(() => {
+          dispatch(listMaterias({ concursoId: +concursoId!, disciplinaId: +disciplinaId! }));
+        })
+        .catch((error: any) => {
+          console.error('Erro ao atualizar matéria:', error);
+        });
+    }
+  };
+
+
   const minutesToTime = (minutes) => {
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
@@ -90,6 +130,18 @@ const MateriaList: React.FC = () => {
   const calculateProgress = (): number => {
     return (timeRemaining / (60 * 40)) * 100;
   };
+
+  const calculatePercentage = (acertadas, total) => {
+    if (total === 0) return 0;
+    return (acertadas / total) * 100;
+  };
+
+  const getColorForPercentage = (percentage: number): string => {
+    if (percentage < 70) return styles.bgRed;
+    if (percentage >= 70 && percentage <= 75) return styles.bgYellow;
+    return styles.bgGreen;
+  };
+  
 
   return (
     <div className={styles.container}>
@@ -107,28 +159,76 @@ const MateriaList: React.FC = () => {
         <thead>
           <tr>
             <th>Nome</th>
-            <th>Porcentagem</th>
             <th>Tempo de Estudo (minutos)</th>
+            <th>% Conclusão</th>
+            <th>Total de Questões</th>
+            <th>Questões Acertadas</th>
+            <th>% de Acertos</th>
             <th>Cronômetro</th>
+            <th>Ações</th>
           </tr>
         </thead>
         <tbody>
           {materias && materias.length > 0 ? (
-            materias.map((materia) => (
-              <tr key={materia.id}>
-                <td>{materia.nome}</td>
-                <td>{materia.porcentagem}%</td>
-                <td>{materia.tempoEstudo}</td>
-                <td>
-                  <Button variant="primary" onClick={() => handleStart(materia)}>
-                    Iniciar
-                  </Button>
-                </td>
-              </tr>
-            ))
+            materias.map((materia) => {
+              const percentage = calculatePercentage(materia.questoesAcertadas, materia.totalQuestoes);
+              const bgColor = percentage >= 75 ? 'bg-success' : percentage >= 70 ? 'bg-warning' : 'bg-danger';
+              return (
+                <tr key={materia.id}>
+                  <td>{materia.nome}</td>
+                  <td>{materia.tempoEstudo}</td>
+                  <td>{materia.porcentagem}%</td>
+                  <td>
+                    <input
+                        type="number"
+                        min="0"
+                        className={styles.inputField}
+                        value={
+                            editedMaterias[materia.id]?.totalQuestoes !== undefined
+                            ? editedMaterias[materia.id]?.totalQuestoes
+                            : materia.totalQuestoes || ''
+                        }
+                        onChange={(e) =>
+                            handleInputChange(materia.id, 'totalQuestoes', Number(e.target.value))
+                        }
+                        />
+                  </td>
+                  <td>
+                    <input
+                        type="number"
+                        min="0"
+                        className={styles.inputField}
+                        value={
+                            editedMaterias[materia.id]?.questoesAcertadas !== undefined
+                            ? editedMaterias[materia.id]?.questoesAcertadas
+                            : materia.questoesAcertadas || ''
+                        }
+                        onChange={(e) =>
+                            handleInputChange(materia.id, 'questoesAcertadas', Number(e.target.value))
+                        }
+                        />
+                  </td>
+                  <td className={`${styles.cell} ${getColorForPercentage(percentage)}`}>
+                    {percentage.toFixed(2)}%
+                 </td>
+                  <td>
+                    <Button variant="primary" onClick={() => handleStart(materia)}>
+                      Iniciar
+                    </Button>
+                  </td>
+                  <td>
+                    <Button
+                        variant="success"
+                        onClick={() => handleSave(materia)}>
+                        Salvar
+                    </Button>
+                  </td>
+                </tr>
+              );
+            })
           ) : (
             <tr>
-              <td colSpan={4} className="text-center">
+              <td colSpan={6} className="text-center">
                 Nenhuma matéria associada
               </td>
             </tr>

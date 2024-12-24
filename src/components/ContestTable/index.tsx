@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Tab, Tabs, Table, ProgressBar, Button } from 'react-bootstrap';
+import { Tab, Tabs, Table, ProgressBar, Button, Row, Col, Card } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, Link } from 'react-router-dom';
 import { RootState } from '../../store/disciplinaStore';
-import { fetchDisciplinasConcurso } from '../../store/disciplinaSlice';
+import { fetchDisciplinasConcurso, fetchDisciplinasOrdemConcurso  } from '../../store/disciplinaSlice';
 
 const ContestTable: React.FC = () => {
   const [key, setKey] = useState<string>('disciplinas');
@@ -16,6 +16,13 @@ const ContestTable: React.FC = () => {
 
   const disciplinasEspecificas = concurso?.listaDisciplinaRequest?.filter((disciplina) => disciplina.categoria == 'ESPECIFICA')
 
+
+  useEffect(() => {
+    if (contestId.id && key === 'outros') {
+      dispatch(fetchDisciplinasOrdemConcurso(contestId.id));
+    }
+  }, [contestId.id, dispatch, key]);
+
   useEffect(() => {
     if (contestId.id) {
       dispatch(fetchDisciplinasConcurso(contestId.id));
@@ -26,13 +33,45 @@ const ContestTable: React.FC = () => {
     return <div>Carregando disciplinas...</div>;
   }
 
+
+  // Função para exibir as disciplinas ordenadas
+  const renderDisciplinasOrdenadas = () => {
+    return (
+      <Row>
+        {concurso.listaDisciplinaRequest && concurso.listaDisciplinaRequest.length > 0 ? (
+          concurso.listaDisciplinaRequest.map((disciplina, index) => (
+            <Col key={disciplina.id} md={6} className="mb-4">
+              <Card className="shadow-sm">
+                <Card.Body>
+                  <Card.Title>{disciplina.nome}</Card.Title>
+                  <p>Categorias: {disciplina.categoria}</p>
+                </Card.Body>
+              </Card>
+            </Col>
+          ))
+        ) : (
+          <Col>
+            <p>Não há disciplinas para exibir na ordem.</p>
+          </Col>
+        )}
+      </Row>
+    );
+  };
+
+
   return (
     <div className="container mt-4">
        <div className="d-flex justify-content-between align-items-center mb-3">
           <h3>Gerenciamento de Disciplinas</h3>
+          <div>
             <Link to={`/contest/table/${contestId.id}/associar`}>
                 <Button variant="primary">Adicionar Disciplina ao Concurso</Button>
             </Link>
+            {/* Link para Ordenar Disciplinas ao Concurso */}
+            <Link to={`/contest/table/${contestId.id}/ordenar`}>
+                <Button variant="secondary">Ordenar Disciplina ao Concurso</Button>
+            </Link>
+          </div>
         </div>
 
       <Tabs
@@ -89,10 +128,10 @@ const ContestTable: React.FC = () => {
         </Tab>
 
         {/* Mais Abas podem ser adicionadas no futuro */}
-        <Tab eventKey="outros" title="Outros">
+        <Tab eventKey="outros" title="Ordem de Estudo">
           <div>
-            {/* Conteúdo para outras abas (por exemplo, resumo, histórico, etc) */}
-            <h5>Em breve, mais informações...</h5>
+            <h5>Disciplinas em Ordem</h5>
+            {renderDisciplinasOrdenadas()}
           </div>
         </Tab>
       </Tabs>

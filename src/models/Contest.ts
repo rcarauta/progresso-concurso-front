@@ -8,4 +8,5 @@ export interface Contest {
     userId: number
     listaDisciplinaEntity: Disciplina[]
     listaDisciplinaRequest: Disciplina[]
+    ordem: number
 }

@@ -114,6 +114,54 @@ export const fetchDisciplinasConcurso = createAsyncThunk(
   }
 );
 
+export const ordenateDisciplina = createAsyncThunk(
+  'disciplinas/ordenateDisciplina',
+  async ({ idConcurso, disciplinaId, numeroOrdem }: { idConcurso: number; disciplinaId: number, numeroOrdem: number },
+    {getState, rejectWithValue }
+  ) => {
+    try {
+      const state: any = getState();
+      const token = state.auth?.token;
+
+      const response = await axios.put(
+        `http://localhost:8080/concurso_disciplina/${idConcurso}/${disciplinaId}/ordenar`,
+         [numeroOrdem],
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Erro ao associar ordem a uma disciplina');
+    }
+  }
+);
+
+
+export const fetchDisciplinasOrdemConcurso = createAsyncThunk(
+  'disciplinas/fetchDisciplinasOrdemConcurso',
+  async (concursoId: string, { getState, rejectWithValue }) => {
+    try {
+      const state: any = getState();
+      const token = state.auth?.token;
+
+      const response = await axios.get(
+        `http://localhost:8080/concurso_disciplina/${concursoId}/listar_ordem`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      return response.data; // Certifique-se de que o retorno seja uma lista de disciplinas
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Erro ao buscar disciplinas');
+    }
+  }
+);
+
 
 
 const disciplinaSlice = createSlice({
@@ -162,6 +210,20 @@ const disciplinaSlice = createSlice({
       .addCase(fetchDisciplinasConcurso.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || 'Erro ao carregar disciplinas.';
+      })
+      //associar oredem disciplina
+      .addCase(ordenateDisciplina.fulfilled, (state, action) => {
+        state.loading = false;
+        state.successMessage = "Ordem da disciplina salva com sucesso!";
+      })
+      //lista disciplina ordem concurso
+      .addCase(fetchDisciplinasOrdemConcurso.fulfilled, (state, action) => {
+        state.loading = false;
+        state.concurso = action.payload;
+      })
+      .addCase(fetchDisciplinasOrdemConcurso.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Erro ao carregar disciplinas na ordem.';
       })
   },
 });

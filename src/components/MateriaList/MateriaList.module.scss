@@ -35,7 +35,7 @@
     font-size: 1rem;
     padding: 0.5rem 1.5rem;
   }
-
+  
   .progressContainer {
     position: relative;
     width: 150px;
@@ -70,5 +70,41 @@
     transform: translate(-50%, -50%);
     font-size: 1.2rem;
     font-weight: bold;
+  }
+  
+  .bgGreen {
+    background-color: #28a745 !important;
+    color: white; 
+  }
+  
+  .bgYellow  {
+    background-color: #ffc107 !important;
+    color: black; 
+  }
+  
+  .bgRed {
+    background-color: #dc3545 !important;
+    color: white; 
+  }
+
+  .cell {
+    text-align: center;
+    padding: 8px;
+  }
+  
+  .inputField {
+    width: 70px;
+    font-size: 14px;
+    padding: 4px;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  
+    &:focus {
+      outline: none;
+      border-color: #007bff;
+      box-shadow: 0 0 4px rgba(0, 123, 255, 0.5);
+    }
+
   }
   

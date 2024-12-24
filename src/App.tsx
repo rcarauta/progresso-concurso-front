@@ -13,6 +13,7 @@ import ListAssociateDisciplina from './components/ContestTable/ListAssociateDisc
 import MateriaForm from './components/MateriaForm';
 import MateriaList from './components/MateriaList';
 import AssociarMaterias from './components/MateriaList/ListAssociateMateria';
+import OrderDisciplina from './components/ContestTable/OrderDisciplina';
 
 const App: React.FC = () => {
   const { isLoggedIn } = useSelector((state: RootState) => state.auth);
@@ -31,6 +32,7 @@ const App: React.FC = () => {
         <Route path="/contests" element={isLoggedIn ? <ContestList /> : <Navigate to="/login" />} />
         <Route path="/contests/table/:id" element={isLoggedIn ? <ContestTable /> : <Navigate to="/login" />} />
         <Route path="/contest/table/:id/associar" element={isLoggedIn ? <ListAssociateDisciplina /> : <Navigate to="/login" /> } />
+        <Route path="/contest/table/:id/ordenar" element={isLoggedIn ? <OrderDisciplina /> : <Navigate to="/login" />} />
         <Route path="/contest/table/:concursoId/:disciplinaId/materias" element={isLoggedIn ? <MateriaList /> : <Navigate to="/login" />} />
         <Route path="/contest/table/:concursoId/:disciplinaId/materias/associar" element={isLoggedIn ? <AssociarMaterias /> : <Navigate to="/login" />} />
         <Route path="*" element={<div>Página não encontrada!</div>} />

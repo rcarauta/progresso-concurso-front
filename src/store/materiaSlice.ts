@@ -48,7 +48,7 @@ export const listMaterias = createAsyncThunk<Materia[], { concursoId: number, di
         const state: any = getState();
         const token = state.auth.token;  // Supondo que o token está no estado de auth
   
-        const response = await axios.get(`http://localhost:8080/materia/${concursoId}/${disciplinaId}/list_associate`, {
+        const response = await axios.get(`http://localhost:8080/concurso_disciplina_materia/${concursoId}/${disciplinaId}/recuperar`, {
           headers: {
             'Authorization': `Bearer ${token}`,
           }
@@ -109,15 +109,15 @@ export const listMateriasSemAssociar = createAsyncThunk<Materia[], { concursoId:
   );
 
 
-export const updateMateria = createAsyncThunk<Materia, Materia, { rejectValue: string }>(
+export const updateMateria = createAsyncThunk<Materia,{ concursoId: number, disciplinaId: number, materia: Materia }, { rejectValue: string }>(
   'materia/updateMateria',
-  async (materia, { getState, rejectWithValue }) => {
+  async ({concursoId, disciplinaId, materia}, { getState, rejectWithValue }) => {
     try {
       const state: any = getState();
       const token = state.auth.token; 
 
       const response = await axios.put(
-        'http://localhost:8080/materia',
+        `http://localhost:8080/concurso_disciplina_materia/${concursoId}/${disciplinaId}/alterar`,
         materia,
         {
           headers: {

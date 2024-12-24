@@ -4,4 +4,5 @@ export interface Disciplina {
     categoria: 'BASICA' | 'ESPECIFICA';
     porcentagem: number;
     ciclos: number;
+    ordem: number;
 }

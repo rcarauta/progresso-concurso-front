@@ -3,4 +3,6 @@ export interface Materia {
     nome: string;
     porcentagem: number;
     tempoEstudo: string;
+    totalQuestoes: number;
+    questoesAcertadas: number;
 }
