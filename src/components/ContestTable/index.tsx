@@ -3,12 +3,22 @@ import { Tab, Tabs, Table, ProgressBar, Button, Row, Col, Card } from 'react-boo
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, Link } from 'react-router-dom';
 import { RootState } from '../../store/disciplinaStore';
-import { fetchDisciplinasConcurso, fetchDisciplinasOrdemConcurso  } from '../../store/disciplinaSlice';
+import { fetchDisciplinasConcurso, 
+  fetchDisciplinasOrdemConcurso,
+  updateCiclosDisciplinaConcurso } from '../../store/disciplinaSlice';
+
+import { fetchDisciplinaMateria } from '../../store/disciplinaMateriaSlice';
+import { DisciplinaMateriaState } from '../../store/disciplinaMateriaStore';
+import { DisciplinaMateria } from '../../models/DisciplinaMateria';
 
 const ContestTable: React.FC = () => {
   const [key, setKey] = useState<string>('disciplinas');
   const contestId = useParams();
   const dispatch = useDispatch();
+
+  const [cicloValues, setCicloValues] = useState<Record<number, number>>({});
+
+  const [disciplinasMateria, setDisciplinasMateria] = useState<DisciplinaMateria[]>([]);
   
   const {concurso, loading } = useSelector((state: RootState) => state.disciplina)
 
@@ -16,6 +26,18 @@ const ContestTable: React.FC = () => {
 
   const disciplinasEspecificas = concurso?.listaDisciplinaRequest?.filter((disciplina) => disciplina.categoria == 'ESPECIFICA')
 
+
+  useEffect(() => {
+    if (contestId.id && key === 'totalQuestoes') {
+      dispatch(fetchDisciplinaMateria({ concursoId: contestId.id }))
+        .unwrap()
+        .then((data) => {
+          console.log(data); 
+          setDisciplinasMateria(data);
+        })
+        .catch((error) => console.error('Erro ao buscar disciplinas:', error));
+    }
+  }, [contestId.id, dispatch, key]);
 
   useEffect(() => {
     if (contestId.id && key === 'outros') {
@@ -58,6 +80,77 @@ const ContestTable: React.FC = () => {
     );
   };
 
+  const renderDisciplinasMateria = () => {
+    const disciplinasMateriaBasicas = disciplinasMateria?.filter((disciplina) => disciplina.categoria === 'BASICA');
+    const disciplinasMateriaEspecificas = disciplinasMateria?.filter((disciplina) => disciplina.categoria === 'ESPECIFICA');
+    return (
+      <Table striped bordered hover>
+        <thead>
+          <tr>
+            <th>Disciplina</th>
+            <th>Total de Questões</th>
+            <th>Questões Acertadas</th>
+            <th>Porcentagem</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td colSpan={4} className="text-center"><strong>Disciplinas Básicas</strong></td>
+          </tr>
+          {disciplinasMateriaBasicas.map((disciplina) => (
+            <tr key={disciplina.nome}>
+              <td>{disciplina.nome}</td>
+              <td>{disciplina.totalQuestoes}</td>
+              <td>{disciplina.questoesAcertadas}</td>
+              <td className={getBackgroundClass(disciplina.totalQuestoes, disciplina.questoesAcertadas)}>
+                {(disciplina.questoesAcertadas / disciplina.totalQuestoes * 100).toFixed(2)}%
+              </td>
+            </tr>
+          ))}
+          <tr>
+            <td colSpan={4} className="text-center"><strong>Disciplinas Específicas</strong></td>
+          </tr>
+          {disciplinasMateriaEspecificas.map((disciplina) => (
+            <tr key={disciplina.nome}>
+              <td>{disciplina.nome}</td>
+              <td>{disciplina.totalQuestoes}</td>
+              <td>{disciplina.questoesAcertadas}</td>
+              <td className={getBackgroundClass(disciplina.totalQuestoes, disciplina.questoesAcertadas)}>
+                {(disciplina.questoesAcertadas / disciplina.totalQuestoes * 100).toFixed(2)}%
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
+    );
+  }
+
+  const handleInputChange = (disciplinaId: number, value: number) => {
+    setCicloValues((prevValues) => ({ ...prevValues, [disciplinaId]: value }));
+  };
+
+
+  const handleCicloUpdate = (disciplinaId: number) => {
+    const ciclos = cicloValues[disciplinaId];
+    if (contestId.id && ciclos !== undefined) {
+      dispatch(
+        updateCiclosDisciplinaConcurso({
+          idConcurso: Number(contestId.id),
+          disciplinaId,
+          ciclos,
+        })
+      );
+    }
+  };
+
+  const getBackgroundClass = (totalQuestoes: number, questoesAcertadas: number): string => {
+    if (totalQuestoes === 0) return 'bg-secondary'; // Cor neutra para casos sem questões
+    const porcentagem = (questoesAcertadas / totalQuestoes) * 100;
+    if (porcentagem < 70) return 'bg-danger';
+    if (porcentagem <= 75) return 'bg-warning';
+    return 'bg-success';
+  };
+
 
   return (
     <div className="container mt-4">
@@ -88,6 +181,7 @@ const ContestTable: React.FC = () => {
                 <th>Disciplina</th>
                 <th>Progresso</th>
                 <th>Ciclos Completos</th>
+                <th>Ações</th>
               </tr>
             </thead>
             <tbody>
@@ -104,7 +198,22 @@ const ContestTable: React.FC = () => {
                     <td>
                       <ProgressBar now={disciplina.porcentagem} label={`${disciplina.porcentagem}%`} />
                     </td>
-                    <td>{disciplina.ciclos}</td>
+                    <td>
+                      <input
+                        type="number"
+                        defaultValue={disciplina.ciclos}
+                        onChange={(e) => handleInputChange(disciplina.id, parseInt(e.target.value))}
+                        style={{ width: '60px' }}
+                      />
+                    </td>
+                    <td>
+                      <Button
+                        variant="success"
+                        onClick={() => handleCicloUpdate(disciplina.id)}
+                      >
+                        Atualizar
+                      </Button>
+                    </td>
                 </tr>
               ))}
               <tr>
@@ -120,7 +229,22 @@ const ContestTable: React.FC = () => {
                     <td>
                       <ProgressBar now={disciplina.porcentagem} label={`${disciplina.porcentagem}%`} />
                     </td>
-                    <td>{disciplina.ciclos}</td>
+                    <td>
+                      <input
+                          type="number"
+                          defaultValue={disciplina.ciclos}
+                          onChange={(e) => handleInputChange(disciplina.id, parseInt(e.target.value))}
+                          style={{ width: '60px' }}
+                        />
+                    </td>
+                    <td>
+                      <Button
+                          variant="success"
+                          onClick={() => handleCicloUpdate(disciplina.id)}
+                        >
+                          Atualizar
+                      </Button>
+                    </td>
                 </tr>
               ))}
             </tbody>
@@ -134,6 +258,12 @@ const ContestTable: React.FC = () => {
             {renderDisciplinasOrdenadas()}
           </div>
         </Tab>
+
+        {/*Aba para verificar questões totais por disciplina*/}
+        <Tab eventKey="totalQuestoes" title="Total Questões">
+          {renderDisciplinasMateria()}
+        </Tab>
+
       </Tabs>
     </div>
   );

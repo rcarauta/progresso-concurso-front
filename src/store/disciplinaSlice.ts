@@ -162,6 +162,31 @@ export const fetchDisciplinasOrdemConcurso = createAsyncThunk(
   }
 );
 
+export const updateCiclosDisciplinaConcurso = createAsyncThunk(
+  'disciplinas/updateCiclosDisciplinaConcurso',
+  async ({ idConcurso, disciplinaId, ciclos }: { idConcurso: number; disciplinaId: number, ciclos: number },
+    {getState, rejectWithValue }
+  ) => {
+    try {
+      const state: any = getState();
+      const token = state.auth?.token;
+
+      const response = await axios.put(
+        `http://localhost:8080/concurso_disciplina/${idConcurso}/${disciplinaId}/atualizar_ciclo`,
+         [ciclos],
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Erro ao associar ordem a uma disciplina');
+    }
+  }
+);
+
 
 
 const disciplinaSlice = createSlice({
