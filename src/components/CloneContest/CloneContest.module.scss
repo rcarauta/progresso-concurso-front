@@ -1,0 +1,48 @@
+/* ConcursoClone.module.scss */
+
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .formGroup {
+    margin-bottom: 15px;
+  }
+  
+  .formLabel {
+    font-weight: bold;
+  }
+  
+  .formControl {
+    width: 100%;
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+  }
+  
+  .select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 6"><path d="M5 6L0 0h10L5 6z" fill="#000"/></svg>') no-repeat right 10px center;
+    background-size: 10px;
+    padding-right: 30px;
+  }
+  
+  .buttonContainer {
+    text-align: center;
+  }
+  
+  .saveButton {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    &:hover {
+      background-color: #0056b3;
+    }
+  }
+  

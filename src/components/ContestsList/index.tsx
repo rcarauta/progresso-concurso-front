@@ -25,7 +25,7 @@ const ContestList: React.FC = () => {
       const fetchContests = async () => {
         setLoading(true); // Inicia o carregamento
         try {
-          const response = await axios.get(`http://localhost:8080/concurso/list/${userId}`, {
+          const response = await axios.get(`http://localhost:8080/concurso/list_porcentagem/${userId}`, {
             headers: {
               'Authorization': `Bearer ${token}`
             },
@@ -46,9 +46,34 @@ const ContestList: React.FC = () => {
     navigate(`/contests/table/${id}`); // Redireciona para a página com a tabela de concursos
   };
 
+  const handleAddContest = () => {
+    navigate('/contests/novo'); // Redireciona para a página de criação de concursos
+  };
+
+  const handleConcursoClone = () => {
+    navigate('/contests/clonar');
+  }
+
+  const handleLoginAsUser = () => {
+    navigate('/user/enter');
+  }
+
   return (
     <div className={`container ${styles.contestListContainer}`}>
-      <h2 className="text-center mt-4">Lista de Concursos</h2>
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <h2 className="mt-4">Lista de Concursos</h2>
+        <button className="btn btn-success" onClick={handleAddContest}>
+          Adicionar Novo Concurso
+        </button>
+        &nbsp;
+        <button className="btn btn-success" onClick={handleConcursoClone}>
+          Clonar Concurso
+        </button>
+        &nbsp;
+        <button className="btn btn-success" onClick={handleLoginAsUser}>
+          Entrar Como Usuário
+        </button>
+      </div>
 
       {loading && (
         <div className="alert alert-info text-center mt-5">

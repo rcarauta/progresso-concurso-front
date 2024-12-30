@@ -8,7 +8,6 @@ import { fetchDisciplinasConcurso,
   updateCiclosDisciplinaConcurso } from '../../store/disciplinaSlice';
 
 import { fetchDisciplinaMateria } from '../../store/disciplinaMateriaSlice';
-import { DisciplinaMateriaState } from '../../store/disciplinaMateriaStore';
 import { DisciplinaMateria } from '../../models/DisciplinaMateria';
 
 const ContestTable: React.FC = () => {
@@ -46,10 +45,10 @@ const ContestTable: React.FC = () => {
   }, [contestId.id, dispatch, key]);
 
   useEffect(() => {
-    if (contestId.id) {
+    if (contestId.id && key == 'disciplinas') {
       dispatch(fetchDisciplinasConcurso(contestId.id));
     }
-  }, [contestId.id, dispatch]);
+  }, [contestId.id, dispatch, key]);
 
   if (loading) {
     return <div>Carregando disciplinas...</div>;

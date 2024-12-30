@@ -4,6 +4,7 @@ import userReducer from './userSlice'; // Seu reducer de usuários
 import disciplinaReducer from './disciplinaSlice';
 import materiaReducer from './materiaSlice';
 import disciplinaMateriaReducer from './disciplinaMateriaSlice';
+import concursoReducer from './concursoSlice';
 
 
 const rootReducer = combineReducers({
@@ -11,7 +12,8 @@ const rootReducer = combineReducers({
     users: userReducer, // userStore também faz parte
     disciplina: disciplinaReducer,
     materia: materiaReducer,
-    disciplinaMateria: disciplinaMateriaReducer
+    disciplinaMateria: disciplinaMateriaReducer,
+    concurso: concursoReducer
 });
 
 export default rootReducer;

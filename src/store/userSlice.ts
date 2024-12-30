@@ -54,6 +54,27 @@ export const fetchUsers = createAsyncThunk(
     }
 );
 
+
+export const loginAsUser = createAsyncThunk(
+    'user/loginAsUser',
+    async (username: string, { getState, rejectWithValue }) => {
+        try {
+
+            const state: any = getState();
+            const token = state.auth.token;
+
+            const response = await axios.post(`http://localhost:8080/login/generate-token/${username}`,{
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                }});
+                
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data || 'Erro ao criar usuário');
+        }
+    } 
+);
+
 const userSlice = createSlice({
     name: 'users',
     initialState,
@@ -91,7 +112,23 @@ const userSlice = createSlice({
             .addCase(fetchUsers.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload as string;
-            });
+            })
+            //login as user
+            .addCase(loginAsUser.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+                state.successMessage = null;
+            })
+            .addCase(loginAsUser.fulfilled, (state, action) => {
+                state.loading = false;
+                state.users.push(action.payload);
+                state.successMessage = "Usuário criado com sucesso!";
+            })
+            .addCase(loginAsUser.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string;
+                state.successMessage = null;
+            })
     },
 });
 
