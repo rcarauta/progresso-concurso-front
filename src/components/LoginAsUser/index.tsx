@@ -20,7 +20,7 @@ const LoginAsUser = () => {
     if (selectedUsername) {
       dispatch(loginAsUser(selectedUsername))
         .then(() => {
-          navigate('/concursos');
+          navigate('/contests');
         })
         .catch((error) => {
           console.error('Erro ao efetuar login como outro usuário:', error);

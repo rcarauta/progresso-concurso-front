@@ -1,6 +1,8 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { User } from '../models/User';
+import { loginSuccess } from './authSlice';
+import { useDispatch } from 'react-redux';
 
 interface UserState {
     users: User[];
@@ -47,6 +49,7 @@ export const fetchUsers = createAsyncThunk(
                     'Authorization': `Bearer ${token}`,
                 }
             });
+
             return response.data;
         } catch (error: any) {
             return rejectWithValue(error.response?.data || 'Erro ao listar usuários');
@@ -57,19 +60,24 @@ export const fetchUsers = createAsyncThunk(
 
 export const loginAsUser = createAsyncThunk(
     'user/loginAsUser',
-    async (username: string, { getState, rejectWithValue }) => {
+    async (username: string, { getState, dispatch, rejectWithValue }) => {
         try {
-
+            
             const state: any = getState();
             const token = state.auth.token;
 
-            const response = await axios.post(`http://localhost:8080/login/generate-token/${username}`,{
+            const response = await axios.post(`http://localhost:8080/login/generate-token/${username}`,'',{
                 headers: {
                     'Authorization': `Bearer ${token}`,
                 }});
-                
+
+                const newToken = response.data.token;
+
+                dispatch(loginSuccess({ username, token: newToken }));
+
             return response.data;
         } catch (error: any) {
+            console.log(error);
             return rejectWithValue(error.response?.data || 'Erro ao criar usuário');
         }
     } 
