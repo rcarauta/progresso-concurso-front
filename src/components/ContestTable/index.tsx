@@ -3,18 +3,21 @@ import { Tab, Tabs, Table, ProgressBar, Button, Row, Col, Card } from 'react-boo
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, Link } from 'react-router-dom';
 import { RootState } from '../../store/disciplinaStore';
+import { RootState as AuthState } from '../../store/authStore';
 import { fetchDisciplinasConcurso, 
   fetchDisciplinasOrdemConcurso,
   updateCiclosDisciplinaConcurso } from '../../store/disciplinaSlice';
 
 import { fetchDisciplinaMateria } from '../../store/disciplinaMateriaSlice';
 import { DisciplinaMateria } from '../../models/DisciplinaMateria';
+import { hasAdminRole } from '../../utils/decodeToken';
 
 const ContestTable: React.FC = () => {
   const [key, setKey] = useState<string>('disciplinas');
   const contestId = useParams();
   const dispatch = useDispatch();
 
+  const { token } = useSelector((state: AuthState) => state.auth);
   const [cicloValues, setCicloValues] = useState<Record<number, number>>({});
 
   const [disciplinasMateria, setDisciplinasMateria] = useState<DisciplinaMateria[]>([]);
@@ -156,13 +159,13 @@ const ContestTable: React.FC = () => {
        <div className="d-flex justify-content-between align-items-center mb-3">
           <h3>Gerenciamento de Disciplinas</h3>
           <div>
-            <Link to={`/contest/table/${contestId.id}/associar`}>
+            {hasAdminRole(token) && (<Link to={`/contest/table/${contestId.id}/associar`}>
                 <Button variant="primary">Adicionar Disciplina ao Concurso</Button>
-            </Link>
+            </Link>)}
             {/* Link para Ordenar Disciplinas ao Concurso */}
-            <Link to={`/contest/table/${contestId.id}/ordenar`}>
+             {hasAdminRole(token) && (<Link to={`/contest/table/${contestId.id}/ordenar`}>
                 <Button variant="secondary">Ordenar Disciplina ao Concurso</Button>
-            </Link>
+            </Link>)}
           </div>
         </div>
 

@@ -2,7 +2,6 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { User } from '../models/User';
 import { loginSuccess } from './authSlice';
-import { useDispatch } from 'react-redux';
 
 interface UserState {
     users: User[];
@@ -62,7 +61,7 @@ export const loginAsUser = createAsyncThunk(
     'user/loginAsUser',
     async (username: string, { getState, dispatch, rejectWithValue }) => {
         try {
-            
+
             const state: any = getState();
             const token = state.auth.token;
 

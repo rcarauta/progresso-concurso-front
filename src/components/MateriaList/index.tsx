@@ -4,11 +4,14 @@ import { listMaterias, updateMateria } from '../../store/materiaSlice';
 import { useParams, Link } from 'react-router-dom';
 import { Table, Button, Modal, Form } from 'react-bootstrap';
 import styles from './MateriaList.module.scss';
+import { RootState as AuthState } from '../../store/authStore';
+import { hasAdminRole } from '../../utils/decodeToken';
 
 const MateriaList: React.FC = () => {
   const { concursoId, disciplinaId } = useParams<{ concursoId: string, disciplinaId: string }>();
   const dispatch = useDispatch();
 
+  const { token } = useSelector((state: AuthState) => state.auth);
   const { materias, loading, error } = useSelector((state: any) => state.materia);
 
   const [editedMaterias, setEditedMaterias] = useState<{ [key: number]: any }>({});
@@ -147,9 +150,9 @@ const MateriaList: React.FC = () => {
     <div className={styles.container}>
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h1>Matérias Associadas</h1>
-        <Link to={`/contest/table/${concursoId}/${disciplinaId}/materias/associar`}>
+       {hasAdminRole(token) && (<Link to={`/contest/table/${concursoId}/${disciplinaId}/materias/associar`}>
           <Button variant="primary">Associar Matéria</Button>
-        </Link>
+        </Link>)}
       </div>
 
       {loading && <p>Carregando...</p>}

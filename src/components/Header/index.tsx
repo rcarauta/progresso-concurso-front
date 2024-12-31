@@ -4,9 +4,10 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../store/authStore';
 import { logout } from '../../store/authSlice';
 import styles from './Header.module.scss';
+import { hasAdminRole } from '../../utils/decodeToken';
 
 const Header: React.FC = () => {
-  const { isLoggedIn, username } = useSelector((state: RootState) => state.auth);
+  const {token, isLoggedIn, username } = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -49,25 +50,25 @@ const Header: React.FC = () => {
               </Link>
             </li>
             <li className="nav-item">
-              <Link className="nav-link" to="/user">
+             {hasAdminRole(token) && (<Link className="nav-link" to="/user">
                 Usuários
-              </Link>
+              </Link>) }
             </li>
             <li className="nav-item">
-              <Link className="nav-link" to="/disciplina/novo">
+             {hasAdminRole(token) && (<Link className="nav-link" to="/disciplina/novo">
                 Disciplinas
-              </Link>
+              </Link>) }
             </li>
             <li className="nav-item">
-              <Link className="nav-link" to="/materia/novo">
+             {hasAdminRole(token) && (<Link className="nav-link" to="/materia/novo">
                 Materias
-              </Link>
+              </Link>) }
             </li>
             {username === 'admin' && (
               <li className="nav-item">
-                <Link className="nav-link" to="/admin">
+                {hasAdminRole(token) && (<Link className="nav-link" to="/admin">
                   Administração
-                </Link>
+                </Link>) }
               </li>
             )}
             <li className="nav-item">

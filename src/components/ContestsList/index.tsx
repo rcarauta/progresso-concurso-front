@@ -6,6 +6,7 @@ import { jwtDecode } from 'jwt-decode';
 import axios from 'axios'; // Usando axios para fazer requisições HTTP
 import styles from './ContestList.module.scss';
 import { Contest } from '../../models/Contest';
+import { hasAdminRole } from '../../utils/decodeToken';
 
 const ContestList: React.FC = () => {
   const { token, username, isLoggedIn } = useSelector((state: RootState) => state.auth);
@@ -62,17 +63,20 @@ const ContestList: React.FC = () => {
     <div className={`container ${styles.contestListContainer}`}>
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2 className="mt-4">Lista de Concursos</h2>
-        <button className="btn btn-success" onClick={handleAddContest}>
-          Adicionar Novo Concurso
-        </button>
-        &nbsp;
-        <button className="btn btn-success" onClick={handleConcursoClone}>
-          Clonar Concurso
-        </button>
-        &nbsp;
-        <button className="btn btn-success" onClick={handleLoginAsUser}>
-          Entrar Como Usuário
-        </button>
+       {hasAdminRole(token) && 
+        ( <button className="btn btn-success" onClick={handleAddContest}>
+            Adicionar Novo Concurso
+          </button> )} 
+
+        {hasAdminRole(token) && 
+        ( <button className="btn btn-success" onClick={handleConcursoClone}>
+            Clonar Concurso
+          </button> )}
+       
+        {hasAdminRole(token) && 
+        ( <button className="btn btn-success" onClick={handleLoginAsUser}>
+            Entrar Como Usuário
+          </button> )}
       </div>
 
       {loading && (
