@@ -21,11 +21,13 @@ const MateriaForm: React.FC = () => {
   });
 
   useEffect(() => {
-    dispatch(recuperaMateria(+materiaId))
-    .unwrap()
-      .then((data: Materia) => {
-        setFormData(data);
-      })
+    if(materiaId != null) {
+      dispatch(recuperaMateria(+materiaId))
+      .unwrap()
+        .then((data: Materia) => {
+          setFormData(data);
+        })
+    }
   }, [])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
