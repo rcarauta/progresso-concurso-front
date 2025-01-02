@@ -1,13 +1,14 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { listMateriasSemAssociar, associarMateria } from '../../../store/materiaSlice';
-import { useParams, Link } from 'react-router-dom';
+import { listMateriasSemAssociar, associarMateria, atualizarMateria } from '../../../store/materiaSlice';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Button, Table, Spinner } from 'react-bootstrap';
 import styles from './ListAssociate.module.scss';
 
 const AssociarMaterias: React.FC = () => {
   const { concursoId, disciplinaId } = useParams<{ concursoId: string, disciplinaId: string }>();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   // Estado da lista de matérias
   const { materias, loading, error, associando, sucessMessage } = useSelector((state: any) => state.materia);
@@ -22,6 +23,10 @@ const AssociarMaterias: React.FC = () => {
   const handleAssociarMateria = (materia: any) => {
     dispatch(associarMateria({concursoId: +concursoId, disciplinaId: +disciplinaId, materia}));
   };
+
+  const updateMateria = (materiaId: number) => {
+    navigate(`/materia/${concursoId}/${disciplinaId}/${materiaId}`);
+  }
 
   return (
     <div className={styles.container}>
@@ -58,6 +63,14 @@ const AssociarMaterias: React.FC = () => {
                     disabled={associando}
                   >
                     {associando ? 'Associando...' : 'Associar'}
+                  </Button>
+                  &nbsp;
+                  <Button 
+                    variant="primary" 
+                    onClick={() => updateMateria(materia.id)} 
+                    disabled={associando}
+                  >
+                    Atualizar Materia
                   </Button>
                 </td>
               </tr>

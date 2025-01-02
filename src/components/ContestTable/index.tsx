@@ -6,7 +6,8 @@ import { RootState } from '../../store/disciplinaStore';
 import { RootState as AuthState } from '../../store/authStore';
 import { fetchDisciplinasConcurso, 
   fetchDisciplinasOrdemConcurso,
-  updateCiclosDisciplinaConcurso } from '../../store/disciplinaSlice';
+  updateCiclosDisciplinaConcurso,
+  deletarDisciplinasConcurso } from '../../store/disciplinaSlice';
 
 import { fetchDisciplinaMateria } from '../../store/disciplinaMateriaSlice';
 import { DisciplinaMateria } from '../../models/DisciplinaMateria';
@@ -81,6 +82,10 @@ const ContestTable: React.FC = () => {
       </Row>
     );
   };
+
+  const deletarDisciplina = (disciplinaId) => {
+      dispatch(deletarDisciplinasConcurso({concursoId: +contestId.id, disciplinaId: +disciplinaId}));
+  }
 
   const renderDisciplinasMateria = () => {
     const disciplinasMateriaBasicas = disciplinasMateria?.filter((disciplina) => disciplina.categoria === 'BASICA');
@@ -184,6 +189,7 @@ const ContestTable: React.FC = () => {
                 <th>Progresso</th>
                 <th>Ciclos Completos</th>
                 <th>Ações</th>
+                {hasAdminRole(token) && ( <th>Deletar Disciplina</th> )}
               </tr>
             </thead>
             <tbody>
@@ -211,11 +217,17 @@ const ContestTable: React.FC = () => {
                     <td>
                       <Button
                         variant="success"
-                        onClick={() => handleCicloUpdate(disciplina.id)}
-                      >
+                        onClick={() => handleCicloUpdate(disciplina.id)}>
                         Atualizar
                       </Button>
                     </td>
+                    {hasAdminRole(token) &&  ( <td>
+                      <Button
+                        variant="danger"
+                        onClick={() => deletarDisciplina(disciplina.id)}>
+                        Deletar
+                      </Button>
+                    </td> )}
                 </tr>
               ))}
               <tr>
@@ -247,6 +259,13 @@ const ContestTable: React.FC = () => {
                           Atualizar
                       </Button>
                     </td>
+                    {hasAdminRole(token) &&  ( <td>
+                      <Button
+                        variant="danger"
+                        onClick={() => deletarDisciplina(disciplina.id)}>
+                        Deletar
+                      </Button>
+                    </td> )}
                 </tr>
               ))}
             </tbody>

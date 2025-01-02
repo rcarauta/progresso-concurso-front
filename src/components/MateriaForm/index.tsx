@@ -1,14 +1,17 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../store/store';
 
 import styles from './MateriaForm.module.scss'; // Importa o módulo SCSS
 import { Materia } from '../../models/Materia';
-import { saveMateria } from '../../store/materiaSlice';
+import { saveMateria, atualizarMateria, recuperaMateria } from '../../store/materiaSlice';
+import { useNavigate, useParams } from 'react-router-dom';
 
 const MateriaForm: React.FC = () => {
+  const {concursoId, disciplinaId, materiaId} = useParams();
   const dispatch = useDispatch<AppDispatch>();
   const { loading, error, sucessMessage } = useSelector((state: RootState) => state.materia);
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState<Materia>({
     id: null,
@@ -16,6 +19,14 @@ const MateriaForm: React.FC = () => {
     porcentagem: 0,
     tempoEstudo: '',
   });
+
+  useEffect(() => {
+    dispatch(recuperaMateria(+materiaId))
+    .unwrap()
+      .then((data: Materia) => {
+        setFormData(data);
+      })
+  }, [])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -27,7 +38,14 @@ const MateriaForm: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    dispatch(saveMateria(formData));   
+    if(materiaId == null) {
+      dispatch(saveMateria(formData));
+      navigate(`/contests`);
+    } else {
+      dispatch(atualizarMateria(formData))
+      navigate(`/contest/table/${concursoId}/${disciplinaId}/materias/associar`)
+    }
+      
   };
 
   return (

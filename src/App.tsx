@@ -33,7 +33,9 @@ const App: React.FC = () => {
         {hasAdminRole(token) &&<Route path="/user/novo" element={isLoggedIn ? <UserForm /> : <Navigate to="/login" />} /> }
         {hasAdminRole(token) && <Route path="/user/enter" element={isLoggedIn ? <LoginAsUser /> : <Navigate to="/login" />} /> }
         {hasAdminRole(token) && <Route path="/disciplina/novo" element={isLoggedIn ? <DisciplinaForm />: <Navigate to="/login" />} />}
+        {hasAdminRole(token) && <Route path="/disciplina/:id/:disciplinaId" element={isLoggedIn ? <DisciplinaForm />: <Navigate to="/login" />} />}
         {hasAdminRole(token) &&<Route path="/materia/novo" element={isLoggedIn ? <MateriaForm /> : <Navigate to="/login" />} /> }
+        {hasAdminRole(token) &&<Route path="/materia/:id/:disciplinaId/:materiaId" element={isLoggedIn ? <MateriaForm /> : <Navigate to="/login" />} /> }
         <Route path="/contests" element={isLoggedIn ? <ContestList /> : <Navigate to="/login" />} />
         {hasAdminRole(token) && <Route path="/contests/clonar" element={isLoggedIn ? <ConcursoClone /> : <Navigate to="/login" />} /> }
         {hasAdminRole(token) && <Route path="/contests/novo" element={isLoggedIn ? <ConcursoForm /> : <Navigate to="/login" />} /> }

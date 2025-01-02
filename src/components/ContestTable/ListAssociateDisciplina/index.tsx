@@ -3,13 +3,14 @@ import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '../../../store/disciplinaStore';
 import { fetchDisciplinas, associateDisciplina } from '../../../store/disciplinaSlice';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Button, Table, Spinner, Alert } from 'react-bootstrap';
 import styles from './ListAssociateDisciplina.module.scss';
 
 const ListAssociateDisciplina: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
 
   const { disciplinas, loading, error, successMessage } = useSelector((state: RootState) => state.disciplina);
 
@@ -26,6 +27,10 @@ const ListAssociateDisciplina: React.FC = () => {
       dispatch(associateDisciplina({ idConcurso: id, idDisciplina: disciplinaId }));
     }
   };
+
+  const updatePage = (disciplinaId: number) => {
+      navigate(`/disciplina/${id}/${disciplinaId}`);
+  }
 
   return (
     <div className={styles.container}>
@@ -60,6 +65,13 @@ const ListAssociateDisciplina: React.FC = () => {
                     onClick={() => handleAssociate(disciplina.id)}
                   >
                     Associar ao Concurso
+                  </Button>
+                  &nbsp;
+                  <Button
+                    className={styles.buttonSuccess}
+                    onClick={() => updatePage(disciplina.id)}
+                  >
+                    Atualizar Disciplina
                   </Button>
                 </td>
               </tr>

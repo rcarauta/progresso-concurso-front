@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { saveDisciplina, clearMessages } from '../../store/disciplinaSlice';
+import { saveDisciplina, findDisciplina, updateDisciplina } from '../../store/disciplinaSlice';
 import styles from './DisciplinaForm.module.scss';
 import { RootState } from '../../store/disciplinaStore';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Disciplina } from '../../models/Disciplina';
 
 const DisciplinaForm = () => {
   const dispatch = useDispatch();
+  const {id, disciplinaId} = useParams();
+  const navigate = useNavigate();
   const { loading, successMessage, error } = useSelector((state: RootState) => state.disciplina);
 
   const [nome, setNome] = useState('');
@@ -14,8 +18,27 @@ const DisciplinaForm = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const disciplina = {nome, categoria, porcentagem: 0, ciclos: 0};
-    dispatch(saveDisciplina(disciplina));
+    if(disciplinaId == null) {
+      dispatch(saveDisciplina(disciplina));
+      navigate(`/contests`);
+    } else {
+      const disciplinaUpdate = {id: +disciplinaId, nome, categoria, porcentagem: 0, ciclos: 0};
+      dispatch(updateDisciplina(disciplinaUpdate));
+      navigate(`/contest/table/${id}/associar`);
+    }
+   
   };
+
+  useEffect(() => {
+    if(disciplinaId != null) {
+      dispatch(findDisciplina(+disciplinaId))
+        .unwrap()
+          .then((disciplina: Disciplina) => {
+            setNome(disciplina.nome);
+            setCategoria(disciplina.categoria);
+          })
+    }
+  }, [])
 
   useEffect(() => {
     if (successMessage || error) {

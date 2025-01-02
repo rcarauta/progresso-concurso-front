@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { listMaterias, updateMateria } from '../../store/materiaSlice';
+import { listMaterias, updateMateria, deleteMateriaDisciplnaConcurso } from '../../store/materiaSlice';
 import { useParams, Link } from 'react-router-dom';
 import { Table, Button, Modal, Form } from 'react-bootstrap';
 import styles from './MateriaList.module.scss';
 import { RootState as AuthState } from '../../store/authStore';
 import { hasAdminRole } from '../../utils/decodeToken';
+import { Materia } from '../../models/Materia';
 
 const MateriaList: React.FC = () => {
   const { concursoId, disciplinaId } = useParams<{ concursoId: string, disciplinaId: string }>();
@@ -95,7 +96,6 @@ const MateriaList: React.FC = () => {
     }
   };
 
-
   const handleSave = (materia) => {
     if (materia) {
       const updatedMateria = {
@@ -122,6 +122,10 @@ const MateriaList: React.FC = () => {
         });
     }
   };
+
+  const desasiciateMateria = (materiaId) => {
+    dispatch(deleteMateriaDisciplnaConcurso({concursoId: +concursoId!, disciplinaId: +disciplinaId!, materiaId: materiaId}))
+  }
 
 
   const minutesToTime = (minutes) => {
@@ -169,6 +173,7 @@ const MateriaList: React.FC = () => {
             <th>% de Acertos</th>
             <th>Cronômetro</th>
             <th>Ações</th>
+            {hasAdminRole(token) && ( <th>Deletar</th> ) }
           </tr>
         </thead>
         <tbody>
@@ -226,6 +231,13 @@ const MateriaList: React.FC = () => {
                         Salvar
                     </Button>
                   </td>
+                  {hasAdminRole(token) && ( <td>
+                    <Button
+                        variant="danger"
+                        onClick={() => desasiciateMateria(materia.id)}>
+                        Desassociar
+                    </Button>
+                  </td> )}
                 </tr>
               );
             })

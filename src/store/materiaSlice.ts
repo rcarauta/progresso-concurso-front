@@ -132,6 +132,75 @@ export const updateMateria = createAsyncThunk<Materia,{ concursoId: number, disc
     }
   }
 );
+
+export const deleteMateriaDisciplnaConcurso = createAsyncThunk<Materia,{ concursoId: number, disciplinaId: number, materiaId: number }, { rejectValue: string }>(
+  'materia/deleteMateriaDisciplnaConcurso',
+  async ({concursoId, disciplinaId, materiaId}, { getState, rejectWithValue }) => {
+    try {
+      const state: any = getState();
+      const token = state.auth.token; 
+
+      const response = await axios.delete(
+        `http://localhost:8080/concurso_disciplina_materia/${concursoId}/${disciplinaId}/${materiaId}/desassociar`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Erro desconhecido');
+    }
+  }
+);
+
+
+export const atualizarMateria = createAsyncThunk(
+  'materia/atualizarMateria',
+  async (materia: Materia, { getState, rejectWithValue }) => {
+    try {
+      const state: any = getState();
+      const token = state.auth.token; 
+
+      const response = await axios.put(
+        `http://localhost:8080/materia/atualizar`,
+        materia,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Erro desconhecido');
+    }
+  }
+);
+
+export const recuperaMateria = createAsyncThunk(
+  'materia/recuperaMateria',
+  async ( materiaId: number , { getState, rejectWithValue }) => {
+    try {
+      const state: any = getState();
+      const token = state.auth.token;  // Supondo que o token está no estado de auth
+
+      const response = await axios.get(`http://localhost:8080/materia/${materiaId}/recuperar_materia`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        }
+      });
+
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Erro desconhecido');
+    }
+  }
+);
+
   
 
 // Cria o Slice do Redux
@@ -204,7 +273,42 @@ const materiaSlice = createSlice({
       .addCase(updateMateria.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || 'Erro ao listar as matérias';
-      });
+      })
+      //deletar Materia
+      .addCase(deleteMateriaDisciplnaConcurso.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(deleteMateriaDisciplnaConcurso.fulfilled, (state) => {
+        state.loading = false;;
+      })
+      .addCase(deleteMateriaDisciplnaConcurso.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || 'Erro ao listar as matérias';
+      }) 
+      //Atualizar materia
+      .addCase(atualizarMateria.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(atualizarMateria.fulfilled, (state, action) => {
+        state.loading = false;
+        state.materia = action.payload;
+      })
+      .addCase(atualizarMateria.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || 'Erro ao listar as matérias';
+      }) 
+      //Recupera materia
+      .addCase(recuperaMateria.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(recuperaMateria.fulfilled, (state, action) => {
+        state.loading = false;
+        state.materia = action.payload;
+      })
+      .addCase(recuperaMateria.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || 'Erro ao listar as matérias';
+      }) 
   },
 });
 

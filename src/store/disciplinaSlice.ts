@@ -10,6 +10,7 @@ interface DisciplinaState {
   disciplinas: Disciplina[];
   error: string | null;
   concurso: Contest;
+  disciplina: Disciplina | null;
 }
 
 const initialState: DisciplinaState = {
@@ -21,6 +22,7 @@ const initialState: DisciplinaState = {
     listaDisciplinaEntity: [],
     listaDisciplinaRequest: []
   } as unknown as Contest,
+  disciplina: null,
 };
 
 export const saveDisciplina = createAsyncThunk(
@@ -162,6 +164,28 @@ export const fetchDisciplinasOrdemConcurso = createAsyncThunk(
   }
 );
 
+export const findDisciplina = createAsyncThunk(
+  'disciplinas/findDisciplina',
+  async (disciplinaId: number, { getState, rejectWithValue }) => {
+    try {
+      const state: any = getState();
+      const token = state.auth?.token;
+
+      const response = await axios.get(
+        `http://localhost:8080/disciplina/${disciplinaId}/selecinar_disciplina`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      return response.data; 
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Erro ao buscar disciplina');
+    }
+  }
+);
+
 export const updateCiclosDisciplinaConcurso = createAsyncThunk(
   'disciplinas/updateCiclosDisciplinaConcurso',
   async ({ idConcurso, disciplinaId, ciclos }: { idConcurso: number; disciplinaId: number, ciclos: number },
@@ -183,6 +207,52 @@ export const updateCiclosDisciplinaConcurso = createAsyncThunk(
       return response.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data || 'Erro ao associar ordem a uma disciplina');
+    }
+  }
+);
+
+export const deletarDisciplinasConcurso = createAsyncThunk(
+  'disciplinas/deletarDisciplinasConcurso',
+  async ({concursoId, disciplinaId}: { concursoId: number, disciplinaId: number}, 
+    { getState, rejectWithValue }) => {
+    try {
+      const state: any = getState();
+      const token = state.auth?.token;
+
+      const response = await axios.delete(
+        `http://localhost:8080/concurso_disciplina/${concursoId}/${disciplinaId}/remover_disciplina`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      return response.data; // Certifique-se de que o retorno seja uma lista de disciplinas
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Erro ao buscar disciplinas');
+    }
+  }
+);
+
+
+export const updateDisciplina = createAsyncThunk(
+  'disciplinas/updateDisciplina',
+  async (disciplina: Disciplina, { getState, rejectWithValue }) => {
+    try {
+      const state: any = getState();
+      const token = state.auth?.token;
+
+      const response = await axios.put(
+        `http://localhost:8080/disciplina/${disciplina.id}/alterar_disciplina`,disciplina,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      return response.data; 
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Erro ao buscar disciplina');
     }
   }
 );
@@ -249,6 +319,32 @@ const disciplinaSlice = createSlice({
       .addCase(fetchDisciplinasOrdemConcurso.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || 'Erro ao carregar disciplinas na ordem.';
+      })
+      //removerDisciplinaConcurso
+      .addCase(deletarDisciplinasConcurso.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(deletarDisciplinasConcurso.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Erro ao carregar disciplinas na ordem.';
+      })
+      //find disciplina
+      .addCase(findDisciplina.fulfilled, (state, action) => {
+        state.loading = false;
+        state.disciplina = action.payload;
+      })
+      .addCase(findDisciplina.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Erro ao carregar disciplinas.';
+      })
+      //update disciplina
+      .addCase(updateDisciplina.fulfilled, (state, action) => {
+        state.loading = false;
+        state.disciplina = action.payload;
+      })
+      .addCase(updateDisciplina.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Erro ao salvar disciplina.';
       })
   },
 });
