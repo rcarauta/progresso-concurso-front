@@ -21,7 +21,9 @@ export const fetchSubtopicsPercentages = createAsyncThunk(
 const listaDisciplinaPorcentagemSlice = createSlice({
   name: 'disciplinas',
   initialState: {
-    disciplinas: ['portugues', 'direitoConstitucional', 'direitoAdministrativo', 'nocoesInformatica'],
+    disciplinas: ['portugues', 'direitoConstitucional', 'direitoAdministrativo', 'nocoesInformatica',
+    'direitoPenal', 'matematica', 'direitoProcessualPenal', 'direitoCivil', 'enfermagem',
+    'codigoProcessoCivil', 'pedagogia', 'administracaoGeral', 'direitoEleitoral'],
     percentages: null,
     subtopics: [] as unknown as PorcentagemSubDisciplina,
     loading: false,
