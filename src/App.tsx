@@ -18,6 +18,8 @@ import ConcursoForm from './components/ContestTable/ContestForm';
 import ConcursoClone from './components/CloneContest';
 import LoginAsUser from './components/LoginAsUser';
 import { hasAdminRole } from './utils/decodeToken';
+import DisciplinaPorcentagem from './components/DisciplinaPorcentagem';
+import SubtopicosPorcentagem from './components/SubdisciplinaPorcentagem';
 
 const App: React.FC = () => {
   const {token, isLoggedIn } = useSelector((state: RootState) => state.auth);
@@ -44,6 +46,8 @@ const App: React.FC = () => {
         {hasAdminRole(token) && <Route path="/contest/table/:id/ordenar" element={isLoggedIn ? <OrderDisciplina /> : <Navigate to="/login" />} /> }
         <Route path="/contest/table/:concursoId/:disciplinaId/materias" element={isLoggedIn ? <MateriaList /> : <Navigate to="/login" />} />
         {hasAdminRole(token) &&<Route path="/contest/table/:concursoId/:disciplinaId/materias/associar" element={isLoggedIn ? <AssociarMaterias /> : <Navigate to="/login" />} /> }
+        <Route path="/porcentage/disciplinas" element={isLoggedIn ? <DisciplinaPorcentagem /> : <Navigate to="/login" />} />
+        <Route path="/porcentage/subdisciplia" element={isLoggedIn ? <SubtopicosPorcentagem /> : <Navigate to="/login" />} />
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     </Router>

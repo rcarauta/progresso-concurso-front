@@ -5,6 +5,7 @@ import disciplinaReducer from './disciplinaSlice';
 import materiaReducer from './materiaSlice';
 import disciplinaMateriaReducer from './disciplinaMateriaSlice';
 import concursoReducer from './concursoSlice';
+import listaDisciplinaPorcentagemReducer from './porcentagemSlice'
 
 
 const rootReducer = combineReducers({
@@ -13,7 +14,8 @@ const rootReducer = combineReducers({
     disciplina: disciplinaReducer,
     materia: materiaReducer,
     disciplinaMateria: disciplinaMateriaReducer,
-    concurso: concursoReducer
+    concurso: concursoReducer,
+    porcentagemDisciplina:listaDisciplinaPorcentagemReducer
 });
 
 export default rootReducer;

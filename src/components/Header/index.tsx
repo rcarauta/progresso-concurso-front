@@ -72,6 +72,16 @@ const Header: React.FC = () => {
               </li>
             )}
             <li className="nav-item">
+              <Link className="nav-link" to="/porcentage/disciplinas">
+                Porcentagem Por Disciplina
+              </Link>
+            </li>
+            <li className="nav-item">
+              <Link className="nav-link" to="/porcentage/subdisciplia">
+                Porcentagem Por Tópico
+              </Link>
+            </li>
+            <li className="nav-item">
               <button className="btn btn-outline-danger nav-link" onClick={handleLogout}>
                 Sair
               </button>
