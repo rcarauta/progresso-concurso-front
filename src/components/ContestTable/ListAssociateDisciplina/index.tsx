@@ -6,6 +6,7 @@ import { fetchDisciplinas, associateDisciplina } from '../../../store/disciplina
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button, Table, Spinner, Alert } from 'react-bootstrap';
 import styles from './ListAssociateDisciplina.module.scss';
+import { Disciplina } from '../../../models/Disciplina';
 
 const ListAssociateDisciplina: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -22,13 +23,13 @@ const ListAssociateDisciplina: React.FC = () => {
   }, [dispatch, id]);
 
   // Handler para associar disciplina
-  const handleAssociate = (disciplinaId: number) => {
+  const handleAssociate = (disciplinaId: number | undefined) => {
     if (id) {
       dispatch(associateDisciplina({ idConcurso: id, idDisciplina: disciplinaId }));
     }
   };
 
-  const updatePage = (disciplinaId: number) => {
+  const updatePage = (disciplinaId: number | undefined) => {
       navigate(`/disciplina/${id}/${disciplinaId}`);
   }
 
@@ -56,7 +57,7 @@ const ListAssociateDisciplina: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {disciplinas.map((disciplina) => (
+            {disciplinas.map((disciplina: Disciplina) => (
               <tr key={disciplina.id}>
                 <td>{disciplina.nome}</td>
                 <td>

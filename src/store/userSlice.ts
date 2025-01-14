@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { User } from '../models/User';
 import { loginSuccess } from './authSlice';
+import { RootState } from './authStore';
 
 interface UserState {
     users: User[];
@@ -22,16 +23,16 @@ export const createUser = createAsyncThunk(
     async (user: User, { getState, rejectWithValue }) => {
         try {
 
-            const state: any = getState();
-            const token = state.auth.token;
+            const state = getState();
+            const token = (state as RootState).auth.token;
 
             const response = await axios.post('http://localhost:8080/user', user,{
                 headers: {
                     'Authorization': `Bearer ${token}`,
                 }});
             return response.data;
-        } catch (error: any) {
-            return rejectWithValue(error.response?.data || 'Erro ao criar usuário');
+        } catch (error: unknown) {
+            return rejectWithValue(error || 'Erro ao criar usuário');
         }
     } 
 );
@@ -40,8 +41,8 @@ export const fetchUsers = createAsyncThunk(
     'user/fetchUsers',
     async (_, { getState, rejectWithValue }) => {
         try {
-            const state: any = getState();
-            const token = state.auth.token;
+            const state = getState();
+            const token = (state as RootState).auth.token;
 
             const response = await axios.get('http://localhost:8080/user/list', {
                 headers: {
@@ -50,8 +51,8 @@ export const fetchUsers = createAsyncThunk(
             });
 
             return response.data;
-        } catch (error: any) {
-            return rejectWithValue(error.response?.data || 'Erro ao listar usuários');
+        } catch (error: unknown) {
+            return rejectWithValue(error || 'Erro ao listar usuários');
         }
     }
 );
@@ -62,8 +63,8 @@ export const loginAsUser = createAsyncThunk(
     async (username: string, { getState, dispatch, rejectWithValue }) => {
         try {
 
-            const state: any = getState();
-            const token = state.auth.token;
+            const state = getState();
+            const token = (state as RootState).auth.token;
 
             const response = await axios.post(`http://localhost:8080/login/generate-token/${username}`,'',{
                 headers: {
@@ -75,9 +76,9 @@ export const loginAsUser = createAsyncThunk(
                 dispatch(loginSuccess({ username, token: newToken }));
 
             return response.data;
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.log(error);
-            return rejectWithValue(error.response?.data || 'Erro ao criar usuário');
+            return rejectWithValue(error || 'Erro ao criar usuário');
         }
     } 
 );

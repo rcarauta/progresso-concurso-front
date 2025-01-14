@@ -7,9 +7,10 @@ import axios from 'axios'; // Usando axios para fazer requisições HTTP
 import styles from './ContestList.module.scss';
 import { Contest } from '../../models/Contest';
 import { hasAdminRole } from '../../utils/decodeToken';
+import { CustomJwtPayload } from '../../utils/CustomJwtPayload';
 
 const ContestList: React.FC = () => {
-  const { token, username, isLoggedIn } = useSelector((state: RootState) => state.auth);
+  const { token, isLoggedIn } = useSelector((state: RootState) => state.auth);
   const [contests, setContests] = useState<Contest[]>([]); // Estado para armazenar os concursos
   const [loading, setLoading] = useState<boolean>(false); // Estado de carregamento
   const [error, setError] = useState<string | null>(null); // Estado de erro
@@ -19,7 +20,7 @@ const ContestList: React.FC = () => {
   useEffect(() => {
     if (isLoggedIn && token) {
       // Decodificando o JWT para extrair o userId
-      const decoded: any = jwtDecode(token);
+      const decoded: CustomJwtPayload = jwtDecode(token);
       const userId = decoded.userId; // Extraindo o userId do token decodificado
 
       // Função para buscar os concursos
@@ -43,7 +44,7 @@ const ContestList: React.FC = () => {
     }
   }, [isLoggedIn, token]); // Reexecuta o useEffect quando o status de login ou o token mudar
 
-  const handleSeeTable = (id: number) => {
+  const handleSeeTable = (id: number | undefined) => {
     navigate(`/contests/table/${id}`); // Redireciona para a página com a tabela de concursos
   };
 
@@ -98,7 +99,7 @@ const ContestList: React.FC = () => {
       )}
 
       <div className="row mt-4">
-        {contests.map((contest) => (
+        {contests.map((contest: Contest) => (
           <div className="col-md-4" key={contest.id}>
             <div className="card p-3 mb-4 shadow-sm">
               <h5>{contest.nome}</h5>

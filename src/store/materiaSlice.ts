@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { Materia } from '../models/Materia';
+import { RootState } from './authStore';
 
 
 // Define o estado inicial
@@ -21,12 +22,12 @@ const initialState: MateriaState = {
 };
 
 // Define o Thunk para salvar a matéria
-export const saveMateria = createAsyncThunk<Materia, Materia, { rejectValue: string }>(
+export const saveMateria = createAsyncThunk<Materia, Materia>(
   'materia/saveMateria',
   async (materia, {getState, rejectWithValue }) => {
     try {
-        const state: any = getState();
-        const token = state.auth.token;
+        const state = getState();
+        const token = (state as RootState).auth.token;
 
       const response = await axios.post('http://localhost:8080/materia', materia, {
         headers: {
@@ -34,19 +35,19 @@ export const saveMateria = createAsyncThunk<Materia, Materia, { rejectValue: str
         }});
 
       return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data || 'Erro desconhecido');
+    } catch (error: unknown) {
+      return rejectWithValue(error || 'Erro desconhecido');
     }
   }
 );
 
 // Thunk para listar as matérias associadas
-export const listMaterias = createAsyncThunk<Materia[], { concursoId: number, disciplinaId: number }, { rejectValue: string }>(
+export const listMaterias = createAsyncThunk<Materia[], { concursoId: number, disciplinaId: number }>(
     'materia/listMaterias',
     async ({ concursoId, disciplinaId }, { getState, rejectWithValue }) => {
       try {
-        const state: any = getState();
-        const token = state.auth.token;  // Supondo que o token está no estado de auth
+        const state = getState();
+        const token = (state as RootState).auth.token;  // Supondo que o token está no estado de auth
   
         const response = await axios.get(`http://localhost:8080/concurso_disciplina_materia/${concursoId}/${disciplinaId}/recuperar`, {
           headers: {
@@ -55,19 +56,19 @@ export const listMaterias = createAsyncThunk<Materia[], { concursoId: number, di
         });
   
         return response.data;
-      } catch (error: any) {
-        return rejectWithValue(error.response?.data || 'Erro desconhecido');
+      } catch (error: unknown) {
+        return rejectWithValue(error || 'Erro desconhecido');
       }
     }
   );
 
   // Thunk para listar as matérias associadas
-export const listMateriasSemAssociar = createAsyncThunk<Materia[], { concursoId: number, disciplinaId: number }, { rejectValue: string }>(
+export const listMateriasSemAssociar = createAsyncThunk<Materia[], { concursoId: number, disciplinaId: number }>(
     'materia/listMateriasSemAssociar',
     async ({ concursoId, disciplinaId }, { getState, rejectWithValue }) => {
       try {
-        const state: any = getState();
-        const token = state.auth.token;  // Supondo que o token está no estado de auth
+        const state = getState();
+        const token = (state as RootState).auth.token;  // Supondo que o token está no estado de auth
   
         const response = await axios.get(`http://localhost:8080/materia/${concursoId}/${disciplinaId}/list`, {
           headers: {
@@ -76,20 +77,20 @@ export const listMateriasSemAssociar = createAsyncThunk<Materia[], { concursoId:
         });
   
         return response.data;
-      } catch (error: any) {
-        return rejectWithValue(error.response?.data || 'Erro desconhecido');
+      } catch (error: unknown) {
+        return rejectWithValue(error || 'Erro desconhecido');
       }
     }
   );
 
  
-  export const associarMateria = createAsyncThunk<void, { concursoId: number, disciplinaId: number, materia: Materia }, { rejectValue: string }>(
+  export const associarMateria = createAsyncThunk<void, { concursoId: number, disciplinaId: number, materia: Materia }>(
     'materia/associarMateria',
     async ({ concursoId, disciplinaId, materia }, { getState, rejectWithValue }) => {
       try {
         // Pegando o token do estado de autenticação
-        const state: any = getState();
-        const token = state.auth.token;  // Supondo que o token está no estado de auth
+        const state = getState();
+        const token = (state as RootState).auth.token;  // Supondo que o token está no estado de auth
   
         // Fazendo a requisição POST para associar a matéria
         await axios.post(
@@ -101,20 +102,20 @@ export const listMateriasSemAssociar = createAsyncThunk<Materia[], { concursoId:
             }
           }
         );
-      } catch (error: any) {
+      } catch (error: unknown) {
         // Se ocorrer um erro, retorna a mensagem de erro
-        return rejectWithValue(error.response?.data || 'Erro desconhecido');
+        return rejectWithValue(error || 'Erro desconhecido');
       }
     }
   );
 
 
-export const updateMateria = createAsyncThunk<Materia,{ concursoId: number, disciplinaId: number, materia: Materia }, { rejectValue: string }>(
+export const updateMateria = createAsyncThunk<Materia,{ concursoId: number, disciplinaId: number, materia: Materia }>(
   'materia/updateMateria',
   async ({concursoId, disciplinaId, materia}, { getState, rejectWithValue }) => {
     try {
-      const state: any = getState();
-      const token = state.auth.token; 
+      const state = getState();
+      const token = (state as RootState).auth.token; 
 
       const response = await axios.put(
         `http://localhost:8080/concurso_disciplina_materia/${concursoId}/${disciplinaId}/alterar`,
@@ -127,18 +128,18 @@ export const updateMateria = createAsyncThunk<Materia,{ concursoId: number, disc
       );
 
       return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data || 'Erro desconhecido');
+    } catch (error: unknown) {
+      return rejectWithValue(error || 'Erro desconhecido');
     }
   }
 );
 
-export const deleteMateriaDisciplnaConcurso = createAsyncThunk<Materia,{ concursoId: number, disciplinaId: number, materiaId: number }, { rejectValue: string }>(
+export const deleteMateriaDisciplnaConcurso = createAsyncThunk<Materia,{ concursoId: number, disciplinaId: number, materiaId: number }>(
   'materia/deleteMateriaDisciplnaConcurso',
   async ({concursoId, disciplinaId, materiaId}, { getState, rejectWithValue }) => {
     try {
-      const state: any = getState();
-      const token = state.auth.token; 
+      const state = getState();
+      const token = (state as RootState).auth.token; 
 
       const response = await axios.delete(
         `http://localhost:8080/concurso_disciplina_materia/${concursoId}/${disciplinaId}/${materiaId}/desassociar`,
@@ -150,8 +151,8 @@ export const deleteMateriaDisciplnaConcurso = createAsyncThunk<Materia,{ concurs
       );
 
       return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data || 'Erro desconhecido');
+    } catch (error: unknown) {
+      return rejectWithValue(error || 'Erro desconhecido');
     }
   }
 );
@@ -161,8 +162,8 @@ export const atualizarMateria = createAsyncThunk(
   'materia/atualizarMateria',
   async (materia: Materia, { getState, rejectWithValue }) => {
     try {
-      const state: any = getState();
-      const token = state.auth.token; 
+      const state = getState();
+      const token = (state as RootState).auth.token; 
 
       const response = await axios.put(
         `http://localhost:8080/materia/atualizar`,
@@ -175,8 +176,8 @@ export const atualizarMateria = createAsyncThunk(
       );
 
       return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data || 'Erro desconhecido');
+    } catch (error: unknown) {
+      return rejectWithValue(error || 'Erro desconhecido');
     }
   }
 );
@@ -185,8 +186,8 @@ export const recuperaMateria = createAsyncThunk(
   'materia/recuperaMateria',
   async ( materiaId: number , { getState, rejectWithValue }) => {
     try {
-      const state: any = getState();
-      const token = state.auth.token;  // Supondo que o token está no estado de auth
+      const state = getState();
+      const token = (state as RootState).auth.token;  // Supondo que o token está no estado de auth
 
       const response = await axios.get(`http://localhost:8080/materia/${materiaId}/recuperar_materia`, {
         headers: {
@@ -195,8 +196,8 @@ export const recuperaMateria = createAsyncThunk(
       });
 
       return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data || 'Erro desconhecido');
+    } catch (error: unknown) {
+      return rejectWithValue(error || 'Erro desconhecido');
     }
   }
 );
@@ -219,9 +220,8 @@ const materiaSlice = createSlice({
         state.materia = action.payload;
         state.sucessMessage = 'Matéria salva com sucesso!';
       })
-      .addCase(saveMateria.rejected, (state, action) => {
+      .addCase(saveMateria.rejected, (state) => {
         state.loading = false;
-        state.error = action.payload || 'Erro ao salvar a matéria';
         state.sucessMessage = null;
       })
       //listar Materias
@@ -233,9 +233,8 @@ const materiaSlice = createSlice({
         state.loading = false;
         state.materias = action.payload;
       })
-      .addCase(listMaterias.rejected, (state, action) => {
+      .addCase(listMaterias.rejected, (state) => {
         state.loading = false;
-        state.error = action.payload || 'Erro ao listar as matérias';
       })
       //lista Materias Sem Associar
       .addCase(listMateriasSemAssociar.pending, (state) => {
@@ -245,15 +244,14 @@ const materiaSlice = createSlice({
         state.loading = false;
         state.materias = action.payload;
       })
-      .addCase(listMateriasSemAssociar.rejected, (state, action) => {
+      .addCase(listMateriasSemAssociar.rejected, (state) => {
         state.loading = false;
-        state.error = action.payload || 'Erro ao listar as matérias';
       })
       //associar materia
       .addCase(associarMateria.pending, (state) => {
         state.loading = true;
       })
-      .addCase(associarMateria.fulfilled, (state, action) => {
+      .addCase(associarMateria.fulfilled, (state) => {
         state.loading = false;
         state.sucessMessage = "matéria associada com sucesso!";
         // Lógica para atualizar a lista de matérias ou status, se necessário
@@ -270,9 +268,8 @@ const materiaSlice = createSlice({
         state.loading = false;
         state.materia = action.payload;
       })
-      .addCase(updateMateria.rejected, (state, action) => {
+      .addCase(updateMateria.rejected, (state) => {
         state.loading = false;
-        state.error = action.payload || 'Erro ao listar as matérias';
       })
       //deletar Materia
       .addCase(deleteMateriaDisciplnaConcurso.pending, (state) => {
@@ -281,9 +278,8 @@ const materiaSlice = createSlice({
       .addCase(deleteMateriaDisciplnaConcurso.fulfilled, (state) => {
         state.loading = false;;
       })
-      .addCase(deleteMateriaDisciplnaConcurso.rejected, (state, action) => {
+      .addCase(deleteMateriaDisciplnaConcurso.rejected, (state) => {
         state.loading = false;
-        state.error = action.payload || 'Erro ao listar as matérias';
       }) 
       //Atualizar materia
       .addCase(atualizarMateria.pending, (state) => {
@@ -293,9 +289,8 @@ const materiaSlice = createSlice({
         state.loading = false;
         state.materia = action.payload;
       })
-      .addCase(atualizarMateria.rejected, (state, action) => {
+      .addCase(atualizarMateria.rejected, (state) => {
         state.loading = false;
-        state.error = action.payload || 'Erro ao listar as matérias';
       }) 
       //Recupera materia
       .addCase(recuperaMateria.pending, (state) => {
@@ -305,9 +300,8 @@ const materiaSlice = createSlice({
         state.loading = false;
         state.materia = action.payload;
       })
-      .addCase(recuperaMateria.rejected, (state, action) => {
+      .addCase(recuperaMateria.rejected, (state) => {
         state.loading = false;
-        state.error = action.payload || 'Erro ao listar as matérias';
       }) 
   },
 });

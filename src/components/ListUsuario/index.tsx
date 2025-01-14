@@ -1,12 +1,14 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { fetchUsers } from '../../store/userSlice';
 import styles from './ListUsuario.module.scss';
+import { AppDispatch, RootState } from '../../store/userStore';
+import { User } from '../../models/User';
 
 const UserList = () => {
-  const dispatch = useDispatch();
-  const { users, loading, error } = useSelector((state) => state.users);
+  const dispatch = useDispatch<AppDispatch>();
+  const { users, loading, error } = useSelector((state: RootState) => state.users);
   const navigate = useNavigate();
 
   const userNovo = () => {
@@ -39,7 +41,7 @@ const UserList = () => {
           </tr>
         </thead>
         <tbody>
-          {users.map((user) => (
+          {users.map((user: User) => (
             <tr key={user.id}>
               <td>{user.id}</td>
               <td>{user.username}</td>

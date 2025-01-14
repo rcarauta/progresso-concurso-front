@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { DisciplinaMateria } from '../models/DisciplinaMateria';
+import { RootState } from './authStore';
 
 // Estado inicial
 interface DisciplinaState {
@@ -16,12 +17,12 @@ const initialState: DisciplinaState = {
 };
 
 
-export const fetchDisciplinaMateria = createAsyncThunk<DisciplinaMateria[], { concursoId: string }, { rejectValue: string }>(
+export const fetchDisciplinaMateria = createAsyncThunk<DisciplinaMateria[], { concursoId: string }>(
   'disciplinas/fetchDisciplinaMateria',
   async ({ concursoId }, { getState, rejectWithValue }) => {
     try {
-      const state: any = getState();
-      const token = state.auth.token; 
+      const state = getState();
+      const token = (state as RootState).auth.token; 
 
       const response = await axios.get(`http://localhost:8080/disciplina_materia/${concursoId}/questoes_total`, {
         headers: {
@@ -30,8 +31,8 @@ export const fetchDisciplinaMateria = createAsyncThunk<DisciplinaMateria[], { co
       });
 
       return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data || 'Erro desconhecido');
+    } catch (error: unknown) {
+      return rejectWithValue(error || 'Erro desconhecido');
     }
   }
 );

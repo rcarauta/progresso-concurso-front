@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchSubtopicsPercentages } from '../../store/porcentagemSlice';
 import styles from './SubdisciplinaPorcentagem.module.scss'; 
-import { PorcentagemDisciplinaState } from '../../store/porcentagemStore';
+import { AppDispatch, PorcentagemDisciplinaState } from '../../store/porcentagemStore';
 
 const SubtopicosPorcentagem: React.FC = () => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const { disciplinas, subtopics, loading, error } = useSelector((state: PorcentagemDisciplinaState) => state.porcentagemDisciplina);
 
   const [selectedDisciplina, setSelectedDisciplina] = useState('');

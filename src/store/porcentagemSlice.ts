@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { PorcentagemSubDisciplina } from '../models/PorcentagemSubDisciplina';
+import { PorcentagemDisciplina } from '../models/PorcentagemDisciplina';
 
 export const fetchPercentages = createAsyncThunk(
   'disciplinas/fetchPercentages',
@@ -23,9 +24,9 @@ const listaDisciplinaPorcentagemSlice = createSlice({
   initialState: {
     disciplinas: ['portugues', 'direitoConstitucional', 'direitoAdministrativo', 'nocoesInformatica',
     'direitoPenal', 'matematica', 'direitoProcessualPenal', 'direitoCivil', 'enfermagem',
-    'codigoProcessoCivil', 'pedagogia', 'administracaoGeral', 'direitoEleitoral'],
-    percentages: null,
-    subtopics: [] as unknown as PorcentagemSubDisciplina,
+    'codigoProcessoCivil', 'pedagogia', 'administracaoGeral', 'direitoEleitoral','psicologia'],
+    percentages: []  as PorcentagemDisciplina[],
+    subtopics: [] as unknown as PorcentagemSubDisciplina[],
     loading: false,
     error: null,
   },

@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchPercentages } from '../../store/porcentagemSlice';
 import styles from './DisciplinaPorcentagem.module.scss'; 
-import { PorcentagemDisciplinaState } from '../../store/porcentagemStore';
+import { AppDispatch, PorcentagemDisciplinaState } from '../../store/porcentagemStore';
 
 const DisciplinaPorcentagem:  React.FC = () => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const { disciplinas, percentages, loading, error } = useSelector((state: PorcentagemDisciplinaState) => state.porcentagemDisciplina);
 
   const [selectedDisciplina, setSelectedDisciplina] = useState('');

@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../store/authStore';
+import { AppDispatch, RootState } from '../../store/authStore';
 import { loginAsync, logout, clearError } from '../../store/authSlice';
 import styles from './LoginForm.module.scss';
 
 const LoginForm: React.FC = () => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const { isLoggedIn, username, error } = useSelector((state: RootState) => state.auth);
 
   const [formData, setFormData] = useState({ username: '', password: '' });

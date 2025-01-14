@@ -1,17 +1,19 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { listMateriasSemAssociar, associarMateria, atualizarMateria } from '../../../store/materiaSlice';
+import { listMateriasSemAssociar, associarMateria } from '../../../store/materiaSlice';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Button, Table, Spinner } from 'react-bootstrap';
 import styles from './ListAssociate.module.scss';
+import { AppDispatch, MateriaState } from '../../../store/materiaStore';
+import { Materia } from '../../../models/Materia';
 
 const AssociarMaterias: React.FC = () => {
   const { concursoId, disciplinaId } = useParams<{ concursoId: string, disciplinaId: string }>();
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
   // Estado da lista de matérias
-  const { materias, loading, error, associando, sucessMessage } = useSelector((state: any) => state.materia);
+  const { materias, loading, error, sucessMessage } = useSelector((state: MateriaState) => state.materia);
 
   useEffect(() => {
     if (concursoId && disciplinaId) {
@@ -20,11 +22,13 @@ const AssociarMaterias: React.FC = () => {
   }, [concursoId, disciplinaId, dispatch]);
 
   // Alteração aqui: ao invés de enviar o ID, passamos o objeto completo 'materia'
-  const handleAssociarMateria = (materia: any) => {
-    dispatch(associarMateria({concursoId: +concursoId, disciplinaId: +disciplinaId, materia}));
+  const handleAssociarMateria = (materia: Materia) => {
+    const idConcurso = concursoId == undefined ? 0 : concursoId;
+    const idDisciplina = disciplinaId == undefined ? 0 : disciplinaId;
+    dispatch(associarMateria({concursoId: +idConcurso, disciplinaId: +idDisciplina, materia}));
   };
 
-  const updateMateria = (materiaId: number) => {
+  const updateMateria = (materiaId: number | null) => {
     navigate(`/materia/${concursoId}/${disciplinaId}/${materiaId}`);
   }
 
@@ -51,7 +55,7 @@ const AssociarMaterias: React.FC = () => {
         </thead>
         <tbody>
           {materias && materias.length > 0 ? (
-            materias.map((materia) => (
+            materias.map((materia:Materia) => (
               <tr key={materia.id}>
                 <td>{materia.nome}</td>
                 <td>{materia.porcentagem}%</td>
@@ -60,15 +64,12 @@ const AssociarMaterias: React.FC = () => {
                   <Button 
                     variant="primary" 
                     onClick={() => handleAssociarMateria(materia)} // Passando o objeto completo 'materia'
-                    disabled={associando}
                   >
-                    {associando ? 'Associando...' : 'Associar'}
                   </Button>
                   &nbsp;
                   <Button 
                     variant="primary" 
                     onClick={() => updateMateria(materia.id)} 
-                    disabled={associando}
                   >
                     Atualizar Materia
                   </Button>

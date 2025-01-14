@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { listConcursos, cloneConcurso } from '../../store/concursoSlice';
 import { fetchUsers } from '../../store/userSlice';
 import { Form, Button } from 'react-bootstrap';
 import { RootState } from '../../store/userStore';
-import { ConcursoStore } from '../../store/concursoStore';
+import { AppDispatch, ConcursoStore } from '../../store/concursoStore';
 import styles from './CloneContest.module.scss';
 
 const ConcursoClone = () => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const { concursos } = useSelector((state: ConcursoStore) => state.concurso);
   const { users } = useSelector((state: RootState) => state.users);
 

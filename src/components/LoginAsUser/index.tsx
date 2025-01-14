@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchUsers, loginAsUser } from '../../store/userSlice';
-import { RootState } from '../../store/userStore';
+import { AppDispatch, RootState } from '../../store/userStore';
 import { Form, Button, Container, Row, Col } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import styles from './LoginAsUser.module.scss';
 
 const LoginAsUser = () => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const user = useSelector((state:RootState) => state.users);
   const [selectedUsername, setSelectedUsername] = useState('');

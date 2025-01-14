@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { saveDisciplina, findDisciplina, updateDisciplina } from '../../store/disciplinaSlice';
 import styles from './DisciplinaForm.module.scss';
-import { RootState } from '../../store/disciplinaStore';
+import { AppDispatch, RootState } from '../../store/disciplinaStore';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Disciplina } from '../../models/Disciplina';
 
 const DisciplinaForm = () => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const {id, disciplinaId} = useParams();
   const navigate = useNavigate();
   const { loading, successMessage, error } = useSelector((state: RootState) => state.disciplina);
@@ -17,7 +17,7 @@ const DisciplinaForm = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const disciplina = {nome, categoria, porcentagem: 0, ciclos: 0};
+    const disciplina: Disciplina = {nome, categoria, porcentagem: 0, ciclos: 0};
     if(disciplinaId == null) {
       dispatch(saveDisciplina(disciplina));
       navigate(`/contests`);
@@ -43,10 +43,13 @@ const DisciplinaForm = () => {
   useEffect(() => {
     if (successMessage || error) {
       setTimeout(() => {
-        dispatch(clearMessages());
+        setNome('');
+        setCategoria('BASICA');
       }, 3000);
     }
   }, [successMessage, error, dispatch]);
+
+
 
   return (
     <div className={`container ${styles.disciplinaForm}`}>

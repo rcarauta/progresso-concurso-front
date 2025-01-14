@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { Contest } from '../models/Contest';
+import { RootState } from './authStore';
 
 // Estado inicial
 interface ConcursoState {
@@ -23,16 +24,16 @@ export const saveConcurso = createAsyncThunk(
     async (concurso: Contest, { getState, rejectWithValue }) => {
       try {
   
-        const state: any = getState();
-        const token = state.auth.token;
+        const state = getState();
+        const token = (state as RootState).auth.token;
   
         const response = await axios.post('http://localhost:8080/concurso', concurso,{
           headers: {
               'Authorization': `Bearer ${token}`,
           }});
         return response.data;
-      } catch (error: any) {
-        return rejectWithValue(error.response?.data || 'Erro ao salvar o concurso');
+      } catch (error: unknown) {
+        return rejectWithValue(error || 'Erro ao salvar o concurso');
       }
     }
   );
@@ -42,16 +43,16 @@ export const saveConcurso = createAsyncThunk(
     async ({concursoId, userId} : {concursoId: number, userId: number}, { getState, rejectWithValue }) => {
       try {
   
-        const state: any = getState();
-        const token = state.auth.token;
+        const state = getState();
+        const token = (state as RootState).auth.token;
   
         const response = await axios.post(`http://localhost:8080/concurso/clonar_concurso/${concursoId}`,[userId],{
           headers: {
               'Authorization': `Bearer ${token}`,
           }});
         return response.data;
-      } catch (error: any) {
-        return rejectWithValue(error.response?.data || 'Erro ao clonar o concurso');
+      } catch (error: unknown) {
+        return rejectWithValue(error || 'Erro ao clonar o concurso');
       }
     }
   );
@@ -62,8 +63,8 @@ export const listConcursos = createAsyncThunk(
     async (_, {getState, rejectWithValue }) => {
       try {
 
-        const state: any = getState();
-        const token = state.auth.token;
+        const state = getState();
+        const token = (state as RootState).auth.token;
 
         const response = await axios.get('http://localhost:8080/concurso/list', {
             headers: {
@@ -72,8 +73,8 @@ export const listConcursos = createAsyncThunk(
 
 
         return response.data;
-      } catch (error: any) {
-        return rejectWithValue(error.response?.data || 'Erro ao buscar concursos');
+      } catch (error: unknown) {
+        return rejectWithValue(error || 'Erro ao buscar concursos');
       }
     }
   );

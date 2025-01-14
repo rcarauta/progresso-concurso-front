@@ -6,19 +6,20 @@ import { Table, Button, Modal, Form } from 'react-bootstrap';
 import styles from './MateriaList.module.scss';
 import { RootState as AuthState } from '../../store/authStore';
 import { hasAdminRole } from '../../utils/decodeToken';
+import { AppDispatch, MateriaState } from '../../store/materiaStore';
 import { Materia } from '../../models/Materia';
 
 const MateriaList: React.FC = () => {
   const { concursoId, disciplinaId } = useParams<{ concursoId: string, disciplinaId: string }>();
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
 
   const { token } = useSelector((state: AuthState) => state.auth);
-  const { materias, loading, error } = useSelector((state: any) => state.materia);
+  const { materias, loading, error } = useSelector((state: MateriaState) => state.materia);
 
-  const [editedMaterias, setEditedMaterias] = useState<{ [key: number]: any }>({});
+  const [editedMaterias, setEditedMaterias] = useState<{ [key: number]: Materia }>({});
   const [showTimerModal, setShowTimerModal] = useState(false);
   const [showPercentageModal, setShowPercentageModal] = useState(false);
-  const [currentMateria, setCurrentMateria] = useState<any>(null);
+  const [currentMateria, setCurrentMateria] = useState<Materia>();
   const [percentage, setPercentage] = useState<number>(0);
   const [timeRemaining, setTimeRemaining] = useState<number>(60 * 40); 
   const [running, setRunning] = useState(false);
@@ -30,7 +31,7 @@ const MateriaList: React.FC = () => {
   }, [concursoId, disciplinaId, dispatch]);
 
   useEffect(() => {
-    let timer: NodeJS.Timeout;
+    let timer: ReturnType<typeof setTimeout> | undefined;
     if (running && timeRemaining > 0) {
       timer = setInterval(() => {
         setTimeRemaining((prev) => prev - 1);
@@ -52,7 +53,7 @@ const MateriaList: React.FC = () => {
     }));
   };
 
-  const handleStart = (materia: any) => {
+  const handleStart = (materia: Materia) => {
     setCurrentMateria(materia);
     setShowTimerModal(true);
     setTimeRemaining(60 * 40); 
@@ -90,20 +91,21 @@ const MateriaList: React.FC = () => {
           dispatch(listMaterias({ concursoId: +concursoId!, disciplinaId: +disciplinaId! }));
           setShowPercentageModal(false);
         })
-        .catch((error: any) => {
+        .catch((error: unknown) => {
           console.error('Erro ao atualizar matéria:', error);
         });
     }
   };
 
-  const handleSave = (materia) => {
+  const handleSave = (materia: Materia) => {
     if (materia) {
+      const materiaId = materia.id == undefined ? 0 : materia.id;
       const updatedMateria = {
         ...materia,
         porcentagem: materia.porcentagem,
         tempoEstudo: minutesToTime(0),
-        totalQuestoes: editedMaterias[materia.id]?.totalQuestoes ?? materia.totalQuestoes,
-        questoesAcertadas: editedMaterias[materia.id]?.questoesAcertadas ?? materia.questoesAcertadas,
+        totalQuestoes: editedMaterias[materiaId]?.totalQuestoes ?? materia.totalQuestoes,
+        questoesAcertadas: editedMaterias[materiaId]?.questoesAcertadas ?? materia.questoesAcertadas,
       };
 
       dispatch(
@@ -117,18 +119,18 @@ const MateriaList: React.FC = () => {
         .then(() => {
           dispatch(listMaterias({ concursoId: +concursoId!, disciplinaId: +disciplinaId! }));
         })
-        .catch((error: any) => {
+        .catch((error: unknown) => {
           console.error('Erro ao atualizar matéria:', error);
         });
     }
   };
 
-  const desasiciateMateria = (materiaId) => {
+  const desasiciateMateria = (materiaId: number) => {
     dispatch(deleteMateriaDisciplnaConcurso({concursoId: +concursoId!, disciplinaId: +disciplinaId!, materiaId: materiaId}))
   }
 
 
-  const minutesToTime = (minutes) => {
+  const minutesToTime = (minutes: number) => {
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
     return `${String(hours).padStart(2, "0")}:${String(mins).padStart(2, "0")}`;
@@ -138,7 +140,7 @@ const MateriaList: React.FC = () => {
     return (timeRemaining / (60 * 40)) * 100;
   };
 
-  const calculatePercentage = (acertadas, total) => {
+  const calculatePercentage = (acertadas: number, total: number) => {
     if (total === 0) return 0;
     return (acertadas / total) * 100;
   };
@@ -180,7 +182,6 @@ const MateriaList: React.FC = () => {
           {materias && materias.length > 0 ? (
             materias.map((materia) => {
               const percentage = calculatePercentage(materia.questoesAcertadas, materia.totalQuestoes);
-              const bgColor = percentage >= 75 ? 'bg-success' : percentage >= 70 ? 'bg-warning' : 'bg-danger';
               return (
                 <tr key={materia.id}>
                   <td>{materia.nome}</td>
@@ -192,12 +193,12 @@ const MateriaList: React.FC = () => {
                         min="0"
                         className={styles.inputField}
                         value={
-                            editedMaterias[materia.id]?.totalQuestoes !== undefined
-                            ? editedMaterias[materia.id]?.totalQuestoes
+                            editedMaterias[materia.id == undefined ? 0 : materia.id]?.totalQuestoes !== undefined
+                            ? editedMaterias[materia.id == undefined ? 0 : materia.id]?.totalQuestoes
                             : materia.totalQuestoes || ''
                         }
                         onChange={(e) =>
-                            handleInputChange(materia.id, 'totalQuestoes', Number(e.target.value))
+                            handleInputChange(materia.id == undefined ? 0 : materia.id, 'totalQuestoes', Number(e.target.value))
                         }
                         />
                   </td>
@@ -207,12 +208,12 @@ const MateriaList: React.FC = () => {
                         min="0"
                         className={styles.inputField}
                         value={
-                            editedMaterias[materia.id]?.questoesAcertadas !== undefined
-                            ? editedMaterias[materia.id]?.questoesAcertadas
+                            editedMaterias[materia.id == undefined ? 0 : materia.id]?.questoesAcertadas !== undefined
+                            ? editedMaterias[materia.id == undefined ? 0 : materia.id]?.questoesAcertadas
                             : materia.questoesAcertadas || ''
                         }
                         onChange={(e) =>
-                            handleInputChange(materia.id, 'questoesAcertadas', Number(e.target.value))
+                            handleInputChange(materia.id == undefined ? 0 : materia.id, 'questoesAcertadas', Number(e.target.value))
                         }
                         />
                   </td>
@@ -234,7 +235,7 @@ const MateriaList: React.FC = () => {
                   {hasAdminRole(token) && ( <td>
                     <Button
                         variant="danger"
-                        onClick={() => desasiciateMateria(materia.id)}>
+                        onClick={() => desasiciateMateria(materia.id == undefined ? 0 : materia.id)}>
                         Desassociar
                     </Button>
                   </td> )}

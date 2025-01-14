@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Tab, Tabs, Table, ProgressBar, Button, Row, Col, Card } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, Link } from 'react-router-dom';
-import { RootState } from '../../store/disciplinaStore';
+import { AppDispatch, RootState } from '../../store/disciplinaStore';
 import { RootState as AuthState } from '../../store/authStore';
 import { fetchDisciplinasConcurso, 
   fetchDisciplinasOrdemConcurso,
@@ -16,7 +16,7 @@ import { hasAdminRole } from '../../utils/decodeToken';
 const ContestTable: React.FC = () => {
   const [key, setKey] = useState<string>('disciplinas');
   const contestId = useParams();
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
 
   const { token } = useSelector((state: AuthState) => state.auth);
   const [cicloValues, setCicloValues] = useState<Record<number, number>>({});
@@ -25,9 +25,13 @@ const ContestTable: React.FC = () => {
   
   const {concurso, loading } = useSelector((state: RootState) => state.disciplina)
 
-  const disciplinasBasicas = concurso?.listaDisciplinaRequest?.filter((disciplina) => disciplina.categoria == 'BASICA');
+  const disciplinasBasicasTemp = concurso?.listaDisciplinaRequest?.filter((disciplina) => disciplina.categoria == 'BASICA');
 
-  const disciplinasEspecificas = concurso?.listaDisciplinaRequest?.filter((disciplina) => disciplina.categoria == 'ESPECIFICA')
+  const disciplinasBasicas = disciplinasBasicasTemp == undefined ? [] : disciplinasBasicasTemp;
+
+  const disciplinasEspecificasTemp = concurso?.listaDisciplinaRequest?.filter((disciplina) => disciplina.categoria == 'ESPECIFICA')
+
+  const disciplinasEspecificas = disciplinasEspecificasTemp == undefined ? [] : disciplinasEspecificasTemp;
 
 
   useEffect(() => {
@@ -64,7 +68,7 @@ const ContestTable: React.FC = () => {
     return (
       <Row>
         {concurso.listaDisciplinaRequest && concurso.listaDisciplinaRequest.length > 0 ? (
-          concurso.listaDisciplinaRequest.map((disciplina, index) => (
+          concurso.listaDisciplinaRequest.map((disciplina) => (
             <Col key={disciplina.id} md={6} className="mb-4">
               <Card className="shadow-sm">
                 <Card.Body>
@@ -83,8 +87,10 @@ const ContestTable: React.FC = () => {
     );
   };
 
-  const deletarDisciplina = (disciplinaId) => {
-      dispatch(deletarDisciplinasConcurso({concursoId: +contestId.id, disciplinaId: +disciplinaId}));
+  const deletarDisciplina = (disciplinaIdTemp: number | undefined) => {
+      const disciplinaId = disciplinaIdTemp == undefined ? 0 : disciplinaIdTemp;
+      const id = contestId.id == undefined ? 0 : contestId.id; 
+      dispatch(deletarDisciplinasConcurso({concursoId: +id, disciplinaId: +disciplinaId}));
   }
 
   const renderDisciplinasMateria = () => {
@@ -132,12 +138,13 @@ const ContestTable: React.FC = () => {
     );
   }
 
-  const handleInputChange = (disciplinaId: number, value: number) => {
-    setCicloValues((prevValues) => ({ ...prevValues, [disciplinaId]: value }));
+  const handleInputChange = (disciplinaId: number | undefined, value: number) => {
+    setCicloValues((prevValues) => ({ ...prevValues, [disciplinaId == undefined ? 0 : disciplinaId]: value }));
   };
 
 
-  const handleCicloUpdate = (disciplinaId: number) => {
+  const handleCicloUpdate = (disciplinaIdTemp: number | undefined) => {
+    const disciplinaId = disciplinaIdTemp == undefined ? 0 : disciplinaIdTemp;
     const ciclos = cicloValues[disciplinaId];
     if (contestId.id && ciclos !== undefined) {
       dispatch(

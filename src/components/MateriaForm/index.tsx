@@ -18,6 +18,8 @@ const MateriaForm: React.FC = () => {
     nome: '',
     porcentagem: 0,
     tempoEstudo: '',
+    totalQuestoes: 0,
+    questoesAcertadas: 0
   });
 
   useEffect(() => {

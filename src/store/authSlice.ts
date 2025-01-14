@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
+import { AppDispatch } from './authStore';
 
 interface AuthState {
   isLoggedIn: boolean;
@@ -51,7 +52,7 @@ export const { loginStart, loginSuccess, loginFailure, logout, clearError } = au
 export default authSlice.reducer;
 
 // Função para login assíncrono
-export const loginAsync = (formData: { username: string; password: string }) => async (dispatch: any) => {
+export const loginAsync = (formData: { username: string; password: string }) => async (dispatch: AppDispatch) => {
   dispatch(loginStart());
   try {
     const response = await axios.post('http://localhost:8080/login', formData);

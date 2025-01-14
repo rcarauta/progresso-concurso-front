@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { Disciplina } from '../models/Disciplina';
 import { Contest } from '../models/Contest';
+import { RootState } from './authStore';
 
 
 interface DisciplinaState {
@@ -30,16 +31,16 @@ export const saveDisciplina = createAsyncThunk(
   async (disciplina: Disciplina, { getState, rejectWithValue }) => {
     try {
 
-      const state: any = getState();
-      const token = state.auth.token;
+      const state = getState();
+      const token = (state as RootState).auth.token;
 
       const response = await axios.post('http://localhost:8080/disciplina', disciplina,{
         headers: {
             'Authorization': `Bearer ${token}`,
         }});
       return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data || 'Erro ao salvar disciplina');
+    } catch (error: unknown) {
+      return rejectWithValue(error || 'Erro ao salvar disciplina');
     }
   }
 );
@@ -47,11 +48,11 @@ export const saveDisciplina = createAsyncThunk(
 
 export const fetchDisciplinas = createAsyncThunk(
   'disciplinas/fetchDisciplinas',
-  async (concursoId, { getState, rejectWithValue }) => {
+  async (concursoId: string, { getState, rejectWithValue }) => {
     try {
       // Obter o token do estado global
-      const state: any = getState();
-      const token = state.auth?.token;
+      const state = getState();
+      const token = (state as RootState).auth?.token;
 
       // Fazer a requisição para buscar disciplinas
       const response = await axios.get(
@@ -63,20 +64,20 @@ export const fetchDisciplinas = createAsyncThunk(
         }
       );
       return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data || 'Erro ao buscar disciplinas');
+    } catch (error: unknown) {
+      return rejectWithValue(error || 'Erro ao buscar disciplinas');
     }
   }
 );
 
 export const associateDisciplina = createAsyncThunk(
   'disciplinas/associateDisciplina',
-  async ({ idConcurso, idDisciplina }: { idConcurso: string; idDisciplina: number },
+  async ({ idConcurso, idDisciplina }: { idConcurso: string; idDisciplina: number | undefined },
     {getState, rejectWithValue }
   ) => {
     try {
-      const state: any = getState();
-      const token = state.auth?.token;
+      const state = getState();
+      const token = (state as RootState).auth?.token;
 
       const response = await axios.post(
         `http://localhost:8080/concurso_disciplina/${idConcurso}/associar`,
@@ -88,8 +89,8 @@ export const associateDisciplina = createAsyncThunk(
         }
       );
       return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data || 'Erro ao associar disciplina');
+    } catch (error: unknown) {
+      return rejectWithValue(error || 'Erro ao associar disciplina');
     }
   }
 );
@@ -98,8 +99,8 @@ export const fetchDisciplinasConcurso = createAsyncThunk(
   'disciplinas/fetchDisciplinasConcurso',
   async (concursoId: string, { getState, rejectWithValue }) => {
     try {
-      const state: any = getState();
-      const token = state.auth?.token;
+      const state = getState();
+      const token = (state as RootState).auth?.token;
 
       const response = await axios.get(
         `http://localhost:8080/concurso_disciplina/${concursoId}/todas_disciplinas`,
@@ -110,8 +111,8 @@ export const fetchDisciplinasConcurso = createAsyncThunk(
         }
       );
       return response.data; // Certifique-se de que o retorno seja uma lista de disciplinas
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data || 'Erro ao buscar disciplinas');
+    } catch (error: unknown) {
+      return rejectWithValue(error || 'Erro ao buscar disciplinas');
     }
   }
 );
@@ -122,8 +123,8 @@ export const ordenateDisciplina = createAsyncThunk(
     {getState, rejectWithValue }
   ) => {
     try {
-      const state: any = getState();
-      const token = state.auth?.token;
+      const state = getState();
+      const token = (state as RootState).auth?.token;
 
       const response = await axios.put(
         `http://localhost:8080/concurso_disciplina/${idConcurso}/${disciplinaId}/ordenar`,
@@ -135,8 +136,8 @@ export const ordenateDisciplina = createAsyncThunk(
         }
       );
       return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data || 'Erro ao associar ordem a uma disciplina');
+    } catch (error: unknown) {
+      return rejectWithValue(error || 'Erro ao associar ordem a uma disciplina');
     }
   }
 );
@@ -146,8 +147,8 @@ export const fetchDisciplinasOrdemConcurso = createAsyncThunk(
   'disciplinas/fetchDisciplinasOrdemConcurso',
   async (concursoId: string, { getState, rejectWithValue }) => {
     try {
-      const state: any = getState();
-      const token = state.auth?.token;
+      const state = getState();
+      const token = (state as RootState).auth?.token;
 
       const response = await axios.get(
         `http://localhost:8080/concurso_disciplina/${concursoId}/listar_ordem`,
@@ -158,8 +159,8 @@ export const fetchDisciplinasOrdemConcurso = createAsyncThunk(
         }
       );
       return response.data; // Certifique-se de que o retorno seja uma lista de disciplinas
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data || 'Erro ao buscar disciplinas');
+    } catch (error: unknown) {
+      return rejectWithValue(error || 'Erro ao buscar disciplinas');
     }
   }
 );
@@ -168,8 +169,8 @@ export const findDisciplina = createAsyncThunk(
   'disciplinas/findDisciplina',
   async (disciplinaId: number, { getState, rejectWithValue }) => {
     try {
-      const state: any = getState();
-      const token = state.auth?.token;
+      const state = getState();
+      const token = (state as RootState).auth?.token;
 
       const response = await axios.get(
         `http://localhost:8080/disciplina/${disciplinaId}/selecinar_disciplina`,
@@ -180,8 +181,8 @@ export const findDisciplina = createAsyncThunk(
         }
       );
       return response.data; 
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data || 'Erro ao buscar disciplina');
+    } catch (error: unknown) {
+      return rejectWithValue(error || 'Erro ao buscar disciplina');
     }
   }
 );
@@ -192,8 +193,8 @@ export const updateCiclosDisciplinaConcurso = createAsyncThunk(
     {getState, rejectWithValue }
   ) => {
     try {
-      const state: any = getState();
-      const token = state.auth?.token;
+      const state = getState();
+      const token = (state as RootState).auth?.token;
 
       const response = await axios.put(
         `http://localhost:8080/concurso_disciplina/${idConcurso}/${disciplinaId}/atualizar_ciclo`,
@@ -205,8 +206,8 @@ export const updateCiclosDisciplinaConcurso = createAsyncThunk(
         }
       );
       return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data || 'Erro ao associar ordem a uma disciplina');
+    } catch (error: unknown) {
+      return rejectWithValue(error || 'Erro ao associar ordem a uma disciplina');
     }
   }
 );
@@ -216,8 +217,8 @@ export const deletarDisciplinasConcurso = createAsyncThunk(
   async ({concursoId, disciplinaId}: { concursoId: number, disciplinaId: number}, 
     { getState, rejectWithValue }) => {
     try {
-      const state: any = getState();
-      const token = state.auth?.token;
+      const state = getState();
+      const token = (state as RootState).auth?.token;
 
       const response = await axios.delete(
         `http://localhost:8080/concurso_disciplina/${concursoId}/${disciplinaId}/remover_disciplina`,
@@ -228,8 +229,8 @@ export const deletarDisciplinasConcurso = createAsyncThunk(
         }
       );
       return response.data; // Certifique-se de que o retorno seja uma lista de disciplinas
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data || 'Erro ao buscar disciplinas');
+    } catch (error: unknown) {
+      return rejectWithValue(error || 'Erro ao buscar disciplinas');
     }
   }
 );
@@ -239,8 +240,8 @@ export const updateDisciplina = createAsyncThunk(
   'disciplinas/updateDisciplina',
   async (disciplina: Disciplina, { getState, rejectWithValue }) => {
     try {
-      const state: any = getState();
-      const token = state.auth?.token;
+      const state = getState();
+      const token = (state as RootState).auth?.token;
 
       const response = await axios.put(
         `http://localhost:8080/disciplina/${disciplina.id}/alterar_disciplina`,disciplina,
@@ -251,8 +252,8 @@ export const updateDisciplina = createAsyncThunk(
         }
       );
       return response.data; 
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data || 'Erro ao buscar disciplina');
+    } catch (error: unknown) {
+      return rejectWithValue(error || 'Erro ao buscar disciplina');
     }
   }
 );
@@ -293,7 +294,7 @@ const disciplinaSlice = createSlice({
         state.error = action.error.message || 'Erro ao carregar disciplinas.';
       })
       //associar disciplina ao concurso
-      .addCase(associateDisciplina.fulfilled, (state, action) => {
+      .addCase(associateDisciplina.fulfilled, (state) => {
         state.loading = false;
         state.successMessage = "Concurso associado com disciplina ocm sucesso!";
       })
@@ -307,7 +308,7 @@ const disciplinaSlice = createSlice({
         state.error = action.error.message || 'Erro ao carregar disciplinas.';
       })
       //associar oredem disciplina
-      .addCase(ordenateDisciplina.fulfilled, (state, action) => {
+      .addCase(ordenateDisciplina.fulfilled, (state) => {
         state.loading = false;
         state.successMessage = "Ordem da disciplina salva com sucesso!";
       })
