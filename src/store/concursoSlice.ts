@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
 import { Contest } from '../models/Contest';
 import { RootState } from './authStore';
+import { http } from '../http';
 
 // Estado inicial
 interface ConcursoState {
@@ -27,7 +27,7 @@ export const saveConcurso = createAsyncThunk(
         const state = getState();
         const token = (state as RootState).auth.token;
   
-        const response = await axios.post('http://localhost:8080/concurso', concurso,{
+        const response = await http.post('/concurso', concurso,{
           headers: {
               'Authorization': `Bearer ${token}`,
           }});
@@ -46,7 +46,7 @@ export const saveConcurso = createAsyncThunk(
         const state = getState();
         const token = (state as RootState).auth.token;
   
-        const response = await axios.post(`http://localhost:8080/concurso/clonar_concurso/${concursoId}`,[userId],{
+        const response = await http.post(`/concurso/clonar_concurso/${concursoId}`,[userId],{
           headers: {
               'Authorization': `Bearer ${token}`,
           }});
@@ -66,12 +66,32 @@ export const listConcursos = createAsyncThunk(
         const state = getState();
         const token = (state as RootState).auth.token;
 
-        const response = await axios.get('http://localhost:8080/concurso/list', {
+        const response = await http.get('/concurso/list', {
             headers: {
                 'Authorization': `Bearer ${token}`,
             }});
 
 
+        return response.data;
+      } catch (error: unknown) {
+        return rejectWithValue(error || 'Erro ao buscar concursos');
+      }
+    }
+  );
+
+  export const fetchContests = createAsyncThunk(
+    'contests/fetchContests',
+    async (userId: number, { getState, rejectWithValue }) => {
+      try {
+        const state = getState() as RootState;
+        const token = state.auth.token;
+  
+        const response = await http.get(`/concurso/list_porcentagem/${userId}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+  
         return response.data;
       } catch (error: unknown) {
         return rejectWithValue(error || 'Erro ao buscar concursos');
@@ -120,7 +140,16 @@ const concursoSlice = createSlice({
           state.loading = false;
           state.error = action.error.message || 'Erro ao carregar concursos.';
       })
-  },
+      //fetch concursos
+      .addCase(fetchContests.fulfilled, (state, action) => {
+          state.loading = false;
+          state.concursos = action.payload;
+      })
+      .addCase(fetchContests.rejected, (state, action) => {
+          state.loading = false;
+          state.error = action.error.message || 'Erro ao carregar concursos.';
+      })
+   },
 });
 
 export default concursoSlice.reducer;

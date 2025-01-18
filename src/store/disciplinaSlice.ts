@@ -1,8 +1,8 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
 import { Disciplina } from '../models/Disciplina';
 import { Contest } from '../models/Contest';
 import { RootState } from './authStore';
+import { http } from '../http';
 
 
 interface DisciplinaState {
@@ -34,7 +34,7 @@ export const saveDisciplina = createAsyncThunk(
       const state = getState();
       const token = (state as RootState).auth.token;
 
-      const response = await axios.post('http://localhost:8080/disciplina', disciplina,{
+      const response = await http.post('/disciplina', disciplina,{
         headers: {
             'Authorization': `Bearer ${token}`,
         }});
@@ -55,8 +55,8 @@ export const fetchDisciplinas = createAsyncThunk(
       const token = (state as RootState).auth?.token;
 
       // Fazer a requisição para buscar disciplinas
-      const response = await axios.get(
-        `http://localhost:8080/disciplina/${concursoId}/list_not_concurso`,
+      const response = await http.get(
+        `/disciplina/${concursoId}/list_not_concurso`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -79,8 +79,8 @@ export const associateDisciplina = createAsyncThunk(
       const state = getState();
       const token = (state as RootState).auth?.token;
 
-      const response = await axios.post(
-        `http://localhost:8080/concurso_disciplina/${idConcurso}/associar`,
+      const response = await http.post(
+        `/concurso_disciplina/${idConcurso}/associar`,
         [idDisciplina],
         {
           headers: {
@@ -102,8 +102,8 @@ export const fetchDisciplinasConcurso = createAsyncThunk(
       const state = getState();
       const token = (state as RootState).auth?.token;
 
-      const response = await axios.get(
-        `http://localhost:8080/concurso_disciplina/${concursoId}/todas_disciplinas`,
+      const response = await http.get(
+        `/concurso_disciplina/${concursoId}/todas_disciplinas`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -126,8 +126,8 @@ export const ordenateDisciplina = createAsyncThunk(
       const state = getState();
       const token = (state as RootState).auth?.token;
 
-      const response = await axios.put(
-        `http://localhost:8080/concurso_disciplina/${idConcurso}/${disciplinaId}/ordenar`,
+      const response = await http.put(
+        `/concurso_disciplina/${idConcurso}/${disciplinaId}/ordenar`,
          [numeroOrdem],
         {
           headers: {
@@ -150,8 +150,8 @@ export const fetchDisciplinasOrdemConcurso = createAsyncThunk(
       const state = getState();
       const token = (state as RootState).auth?.token;
 
-      const response = await axios.get(
-        `http://localhost:8080/concurso_disciplina/${concursoId}/listar_ordem`,
+      const response = await http.get(
+        `/concurso_disciplina/${concursoId}/listar_ordem`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -172,8 +172,8 @@ export const findDisciplina = createAsyncThunk(
       const state = getState();
       const token = (state as RootState).auth?.token;
 
-      const response = await axios.get(
-        `http://localhost:8080/disciplina/${disciplinaId}/selecinar_disciplina`,
+      const response = await http.get(
+        `/disciplina/${disciplinaId}/selecinar_disciplina`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -196,8 +196,8 @@ export const updateCiclosDisciplinaConcurso = createAsyncThunk(
       const state = getState();
       const token = (state as RootState).auth?.token;
 
-      const response = await axios.put(
-        `http://localhost:8080/concurso_disciplina/${idConcurso}/${disciplinaId}/atualizar_ciclo`,
+      const response = await http.put(
+        `/concurso_disciplina/${idConcurso}/${disciplinaId}/atualizar_ciclo`,
          [ciclos],
         {
           headers: {
@@ -220,8 +220,8 @@ export const deletarDisciplinasConcurso = createAsyncThunk(
       const state = getState();
       const token = (state as RootState).auth?.token;
 
-      const response = await axios.delete(
-        `http://localhost:8080/concurso_disciplina/${concursoId}/${disciplinaId}/remover_disciplina`,
+      const response = await http.delete(
+        `/concurso_disciplina/${concursoId}/${disciplinaId}/remover_disciplina`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -243,8 +243,8 @@ export const updateDisciplina = createAsyncThunk(
       const state = getState();
       const token = (state as RootState).auth?.token;
 
-      const response = await axios.put(
-        `http://localhost:8080/disciplina/${disciplina.id}/alterar_disciplina`,disciplina,
+      const response = await http.put(
+        `/disciplina/${disciplina.id}/alterar_disciplina`,disciplina,
         {
           headers: {
             Authorization: `Bearer ${token}`,

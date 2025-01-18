@@ -1,12 +1,12 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
 import { PorcentagemSubDisciplina } from '../models/PorcentagemSubDisciplina';
 import { PorcentagemDisciplina } from '../models/PorcentagemDisciplina';
+import { http } from '../http';
 
 export const fetchPercentages = createAsyncThunk(
   'disciplinas/fetchPercentages',
   async (disciplina: string) => {
-    const response = await axios.get(`http://localhost:5000/topics/percentages?disciplina=${disciplina}`);
+    const response = await http.get(`http://localhost:5000/topics/percentages?disciplina=${disciplina}`);
     return response.data;
   }
 );
@@ -14,7 +14,7 @@ export const fetchPercentages = createAsyncThunk(
 export const fetchSubtopicsPercentages = createAsyncThunk(
     'subtopics/fetchSubtopicsPercentages',
     async (disciplina: string) => {
-      const response = await axios.get(`http://localhost:5001/subtopics/percentages?disciplina=${disciplina}`);
+      const response = await http.get(`http://localhost:5001/subtopics/percentages?disciplina=${disciplina}`);
       return response.data;
     }
   );

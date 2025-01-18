@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
 import { DisciplinaMateria } from '../models/DisciplinaMateria';
 import { RootState } from './authStore';
+import { http } from '../http';
 
 // Estado inicial
 interface DisciplinaState {
@@ -24,7 +24,7 @@ export const fetchDisciplinaMateria = createAsyncThunk<DisciplinaMateria[], { co
       const state = getState();
       const token = (state as RootState).auth.token; 
 
-      const response = await axios.get(`http://localhost:8080/disciplina_materia/${concursoId}/questoes_total`, {
+      const response = await http.get(`/disciplina_materia/${concursoId}/questoes_total`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },

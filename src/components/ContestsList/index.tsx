@@ -1,48 +1,34 @@
 import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch  } from 'react-redux';
 import { RootState } from '../../store/authStore';
+import { ConcursoStore } from '../../store/concursoStore'; 
 import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
-import axios from 'axios'; // Usando axios para fazer requisições HTTP
 import styles from './ContestList.module.scss';
 import { Contest } from '../../models/Contest';
 import { hasAdminRole } from '../../utils/decodeToken';
 import { CustomJwtPayload } from '../../utils/CustomJwtPayload';
+import { AppDispatch } from '../../store/userStore';
+import { fetchContests } from '../../store/concursoSlice';
 
 const ContestList: React.FC = () => {
-  const { token, isLoggedIn } = useSelector((state: RootState) => state.auth);
-  const [contests, setContests] = useState<Contest[]>([]); // Estado para armazenar os concursos
-  const [loading, setLoading] = useState<boolean>(false); // Estado de carregamento
-  const [error, setError] = useState<string | null>(null); // Estado de erro
+  const { token } = useSelector((state: RootState) => state.auth);
+  const { concursos } = useSelector((state: ConcursoStore) => state.concurso);
+  const [loading] = useState<boolean>(false); // Estado de carregamento
+  const [error] = useState<string | null>(null); // Estado de erro
 
   const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
+    
 
   useEffect(() => {
-    if (isLoggedIn && token) {
-      // Decodificando o JWT para extrair o userId
-      const decoded: CustomJwtPayload = jwtDecode(token);
-      const userId = decoded.userId; // Extraindo o userId do token decodificado
-
-      // Função para buscar os concursos
-      const fetchContests = async () => {
-        setLoading(true); // Inicia o carregamento
-        try {
-          const response = await axios.get(`http://localhost:8080/concurso/list_porcentagem/${userId}`, {
-            headers: {
-              'Authorization': `Bearer ${token}`
-            },
-          });
-          setContests(response.data); // Atualiza o estado com os concursos
-        } catch (err) {
-          setError('Erro ao buscar concursos.' +  err);
-        } finally {
-          setLoading(false); // Finaliza o carregamento
-        }
-      };
-
-      fetchContests(); // Chama a função para buscar os concursos
+    const tokenString = token == undefined ? '' : token;
+    const decoded: CustomJwtPayload = jwtDecode(tokenString);
+    const userId = decoded.userId; // Extraindo o userId do token decodificado
+    if (token && userId) {
+      dispatch(fetchContests(userId));
     }
-  }, [isLoggedIn, token]); // Reexecuta o useEffect quando o status de login ou o token mudar
+  }, [dispatch, token]);
 
   const handleSeeTable = (id: number | undefined) => {
     navigate(`/contests/table/${id}`); // Redireciona para a página com a tabela de concursos
@@ -92,14 +78,14 @@ const ContestList: React.FC = () => {
         </div>
       )}
 
-      {!loading && !error && !contests.length && (
+      {!loading && !error && !concursos.length && (
         <div className="alert alert-warning text-center mt-5">
           Sem concursos na lista
         </div>
       )}
 
       <div className="row mt-4">
-        {contests.map((contest: Contest) => (
+        {concursos.map((contest: Contest) => (
           <div className="col-md-4" key={contest.id}>
             <div className="card p-3 mb-4 shadow-sm">
               <h5>{contest.nome}</h5>

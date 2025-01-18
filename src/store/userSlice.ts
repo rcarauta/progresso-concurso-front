@@ -1,8 +1,8 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
 import { User } from '../models/User';
 import { loginSuccess } from './authSlice';
 import { RootState } from './authStore';
+import { http } from '../http';
 
 interface UserState {
     users: User[];
@@ -26,7 +26,7 @@ export const createUser = createAsyncThunk(
             const state = getState();
             const token = (state as RootState).auth.token;
 
-            const response = await axios.post('http://localhost:8080/user', user,{
+            const response = await http.post('/user', user,{
                 headers: {
                     'Authorization': `Bearer ${token}`,
                 }});
@@ -44,7 +44,7 @@ export const fetchUsers = createAsyncThunk(
             const state = getState();
             const token = (state as RootState).auth.token;
 
-            const response = await axios.get('http://localhost:8080/user/list', {
+            const response = await http.get('/user/list', {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                 }
@@ -66,7 +66,7 @@ export const loginAsUser = createAsyncThunk(
             const state = getState();
             const token = (state as RootState).auth.token;
 
-            const response = await axios.post(`http://localhost:8080/login/generate-token/${username}`,'',{
+            const response = await http.post(`/login/generate-token/${username}`,'',{
                 headers: {
                     'Authorization': `Bearer ${token}`,
                 }});

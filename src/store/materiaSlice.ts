@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import axios from 'axios';
 import { Materia } from '../models/Materia';
 import { RootState } from './authStore';
+import { http } from '../http';
 
 
 // Define o estado inicial
@@ -29,7 +29,7 @@ export const saveMateria = createAsyncThunk<Materia, Materia>(
         const state = getState();
         const token = (state as RootState).auth.token;
 
-      const response = await axios.post('http://localhost:8080/materia', materia, {
+      const response = await http.post('/materia', materia, {
         headers: {
             'Authorization': `Bearer ${token}`,
         }});
@@ -49,7 +49,7 @@ export const listMaterias = createAsyncThunk<Materia[], { concursoId: number, di
         const state = getState();
         const token = (state as RootState).auth.token;  // Supondo que o token está no estado de auth
   
-        const response = await axios.get(`http://localhost:8080/concurso_disciplina_materia/${concursoId}/${disciplinaId}/recuperar`, {
+        const response = await http.get(`/concurso_disciplina_materia/${concursoId}/${disciplinaId}/recuperar`, {
           headers: {
             'Authorization': `Bearer ${token}`,
           }
@@ -70,7 +70,7 @@ export const listMateriasSemAssociar = createAsyncThunk<Materia[], { concursoId:
         const state = getState();
         const token = (state as RootState).auth.token;  // Supondo que o token está no estado de auth
   
-        const response = await axios.get(`http://localhost:8080/materia/${concursoId}/${disciplinaId}/list`, {
+        const response = await http.get(`/materia/${concursoId}/${disciplinaId}/list`, {
           headers: {
             'Authorization': `Bearer ${token}`,
           }
@@ -93,8 +93,8 @@ export const listMateriasSemAssociar = createAsyncThunk<Materia[], { concursoId:
         const token = (state as RootState).auth.token;  // Supondo que o token está no estado de auth
   
         // Fazendo a requisição POST para associar a matéria
-        await axios.post(
-          `http://localhost:8080/concurso_disciplina_materia/${concursoId}/${disciplinaId}/associar`,
+        await http.post(
+          `/concurso_disciplina_materia/${concursoId}/${disciplinaId}/associar`,
           materia, // Envia o objeto completo da matéria como corpo da requisição
           {
             headers: {
@@ -117,8 +117,8 @@ export const updateMateria = createAsyncThunk<Materia,{ concursoId: number, disc
       const state = getState();
       const token = (state as RootState).auth.token; 
 
-      const response = await axios.put(
-        `http://localhost:8080/concurso_disciplina_materia/${concursoId}/${disciplinaId}/alterar`,
+      const response = await http.put(
+        `/concurso_disciplina_materia/${concursoId}/${disciplinaId}/alterar`,
         materia,
         {
           headers: {
@@ -141,8 +141,8 @@ export const deleteMateriaDisciplnaConcurso = createAsyncThunk<Materia,{ concurs
       const state = getState();
       const token = (state as RootState).auth.token; 
 
-      const response = await axios.delete(
-        `http://localhost:8080/concurso_disciplina_materia/${concursoId}/${disciplinaId}/${materiaId}/desassociar`,
+      const response = await http.delete(
+        `/concurso_disciplina_materia/${concursoId}/${disciplinaId}/${materiaId}/desassociar`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -165,8 +165,8 @@ export const atualizarMateria = createAsyncThunk(
       const state = getState();
       const token = (state as RootState).auth.token; 
 
-      const response = await axios.put(
-        `http://localhost:8080/materia/atualizar`,
+      const response = await http.put(
+        `/materia/atualizar`,
         materia,
         {
           headers: {
@@ -189,7 +189,7 @@ export const recuperaMateria = createAsyncThunk(
       const state = getState();
       const token = (state as RootState).auth.token;  // Supondo que o token está no estado de auth
 
-      const response = await axios.get(`http://localhost:8080/materia/${materiaId}/recuperar_materia`, {
+      const response = await http.get(`/materia/${materiaId}/recuperar_materia`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         }
